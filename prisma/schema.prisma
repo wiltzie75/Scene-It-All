@@ -22,7 +22,30 @@ model Movie {
   year Int?
   genre String?
   rating Int?
-  review String?
+  reviews Review[]
+  userId Int
+  user User? @relation(fields: [userId], references: [id])
+}
+
+model Review {
+  id Int @id @default(autoincrement())
+  subject String
+  description String
+  userId Int
+  user User @relation(fields: [userId], references: [id])
+  movieId Int
+  movie Movie @relation(fields: [movieId], references: [id])
+  comments Comment[]
+}
+
+model Comment {
+  id Int @id @default(autoincrement())
+  subject String?
+  description String
+  userId Int
+  user User @relation(fields: [userId], references: [id])
+  reviewId Int
+  review Review @relation(fields: [reviewId], references: [id], onDelete: Cascade)
 }
 
 model User {
@@ -31,5 +54,8 @@ model User {
   lastName String
   email String @unique
   password String
+  movies Movie[]
+  reviews Review[]
+  comments Comment[]
   isAdmin Boolean @default(false)
 }

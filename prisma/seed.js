@@ -4,7 +4,13 @@ const seed = async () => {
     
     const createMovie = async () => {
         const movies = [
-            
+            {
+                title: "",
+                description: "",
+                image: "",
+                year: 1975,
+                genre:
+            }
         ]
     }
 
