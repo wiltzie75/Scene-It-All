@@ -6,7 +6,6 @@
 
 generator client {
   provider = "prisma-client-js"
-  output   = "../generated/prisma"
 }
 
 datasource db {
@@ -16,15 +15,19 @@ datasource db {
 
 model Movie {
   id Int @id @default(autoincrement())
+  imdbId String @unique
   title String
-  description String
-  image String
-  year Int?
+  plot String? @db.Text
+  poster String?
+  year String?
   genre String?
-  rating Int?
+  imdbRating Float?
+  imdbVotes String?
+  userRatings UserRating[]
   reviews Review[]
   userId Int
   user User? @relation(fields: [userId], references: [id])
+  favorites Favorite[]
 }
 
 model Review {
@@ -57,5 +60,27 @@ model User {
   movies Movie[]
   reviews Review[]
   comments Comment[]
+  ratings UserRating[]
+  favorites Favorite[]
   isAdmin Boolean @default(false)
+}
+
+model UserRating {
+  id        String   @id @default(uuid())
+  score     Int
+  review    String?  @db.Text
+  movie     Movie    @relation(fields: [movieId], references: [id], onDelete: Cascade)
+  movieId   Int
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId    Int
+  @@unique([userId, movieId])
+}
+
+model Favorite {
+  id        String   @id @default(uuid())
+  movie     Movie    @relation(fields: [movieId], references: [id], onDelete: Cascade)
+  movieId   Int
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId    Int
+  @@unique([userId, movieId])
 }
