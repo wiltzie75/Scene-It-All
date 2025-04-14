@@ -4,5 +4,11 @@
   },
   "dependencies": {
     "@prisma/client": "^6.6.0"
+  },
+  "prisma": {
+    "seed": "node prisma/seed.js"
+  },
+  "scripts": {
+    "start:dev": "nodemon server.js"
   }
 }
