@@ -1,3 +1,45 @@
 node_modules
 # Keep environment variables out of version control
+
+
+# Environment variables
 .env
+
+
+# Build output
+dist/
+build/
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# IDEs and editors
+.vscode/
+.idea/
+
+# Prisma generated files
+prisma/generated/
+
+# Local database (if applicable)
+*.sqlite
+*.db
+*.db-journal
+
+# Optional: ignore coverage output from tests
+coverage/
+
+# Optional: ignore React dev server websocket files
+*.sock
+
+# Optional: local-only config
+*.local.*
+
+# Optional: ignore parcel or other bundlers
+.cache/
