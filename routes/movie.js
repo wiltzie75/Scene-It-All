@@ -2,10 +2,7 @@ const express = require('express');
 const router = express.Router();
 const { PrismaClient } = require('@prisma/client');
 const prisma = new PrismaClient();
-
-
 // get all movies
-
 router.get ('/api/movie',async(req,res) => {
     try {
         const movies = await prisma.movie.findMany();
@@ -26,14 +23,11 @@ router.get('/:id',async(req, res) => {
         if(!movie){
             return res.status(404).json({message: 'Movie not found'});
         } res.json(movie);
-
     } catch (error){
         console.error(error);
         res.status(500).send ('Server error');
     }
-
 });
-
 // create a new movie
 router.post('/',async(req, res)=> {
     const { title, description, image, year, genre, rating, review } = req.body;
@@ -42,10 +36,10 @@ router.post('/',async(req, res)=> {
             data:{
                 title,
                 description,
-                image, 
-                year, 
-                genre, 
-                rating, 
+                image,
+                year,
+                genre,
+                rating,
                 review
             },
         });
@@ -53,30 +47,25 @@ router.post('/',async(req, res)=> {
     }catch(error){
         console.error(error);
         res.status(500).send('Server error');
-
     }
 }
 );
-
 //update movie
 router.put('/:id',async (req,res) => {
     const {id} = req.params;
     const { title, description, image, year, genre, rating, review } = req.body;
-    try{ 
+    try{
         const updateMovie = await prisma.movie.update({
             where : {id : Number(id)},
             data : {
-                title, 
-                description, 
-                image, 
-                year, 
-                genre, 
-                rating, 
+                title,
+                description,
+                image,
+                year,
+                genre,
+                rating,
                 review,
-
             },
-
-
     });
       res.json(updateMovie);
      }catch(error){
@@ -84,7 +73,6 @@ router.put('/:id',async (req,res) => {
         res.status(500).send('Server error');
     }
 });
-
 // delete movie
 router.delete('/:id',async(req,res)=>{
     const{ id } = req.params;
@@ -98,5 +86,4 @@ router.delete('/:id',async(req,res)=>{
         res.status(500).send('Sever error');
     }
 });
-
 module.exports = router;
