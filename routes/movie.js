@@ -1,9 +1,9 @@
 const express = require('express');
 const router = express.Router();
-const { PrismaClient } = require('@prisma/client');
-const prisma = new PrismaClient();
+const prisma = require('../prisma');
+// const movieRoutes = require('./routes/movie');
 // get all movies
-router.get ('/api/movie',async(req,res) => {
+router.get ('/',async(req,res) => {
     try {
         const movies = await prisma.movie.findMany();
         res.json(movies);
