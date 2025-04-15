@@ -1,5 +1,5 @@
-const express = require('express'); // 引入 Express
-const app = express(); // 创建 Express 应用实例
+const express = require('express');
+const app = express(); 
 const movieRoutes = require('./routes/movie');
 const reviewRoutes = require('./routes/reviews');
 const userRoutes = require('./routes/users');
