@@ -1,4 +1,4 @@
-const prisma = require("./index");
+const prisma = require('./index');
 
 const seed = async () => {
 
