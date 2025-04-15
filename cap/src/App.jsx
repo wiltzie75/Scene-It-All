@@ -2,6 +2,7 @@ import { useState } from 'react';
 import './App.css';
 import { Routes, Route, Navigate } from "react-router-dom";
 import { Box, Container } from "@mui/material";
+import Movies from '../components/Movies';
 
 function App() {
   const [count, setCount] = useState(0)
@@ -20,7 +21,7 @@ function App() {
         <Routes>
           <Route path="/" element={<Navigate to="/movies" />} />
           <Route path="/movies" element={<Movies />} />
-          <Route path="/top rated" element={<TopRated />} />
+          {/* <Route path="/top rated" element={<TopRated />} /> */}
           {/* <Route
             path="/admin"
             element={isLoggedIn ? <AdminPanel /> : <Navigate to="/" />}
