@@ -6,7 +6,7 @@
 
 generator client {
   provider = "prisma-client-js"
-  output   = "../generated/prisma"
+  output   = "./generated/prisma"
 }
 
 datasource db {
@@ -15,14 +15,32 @@ datasource db {
 }
 
 model Movie {
-  id          Int     @id @default(autoincrement())
+  id          Int      @id @default(autoincrement())
   title       String
   description String
   image       String
   year        Int?
   genre       String?
-  rating      Int?
-  review      String?
+  rating      Float?
+  reviews     Review[]
+}
+
+model Review {
+  id        Int       @id @default(autoincrement())
+  content   String
+  rating    Float
+  movie     Movie     @relation(fields: [movieId], references: [id])
+  movieId   Int
+  createdAt DateTime  @default(now())
+  comments  Comment[]
+}
+
+model Comment {
+  id        Int      @id @default(autoincrement())
+  content   String
+  createdAt DateTime @default(now())
+  review    Review   @relation(fields: [reviewId], references: [id])
+  reviewId  Int
 }
 
 model User {
