@@ -13,6 +13,7 @@ const seed = async () => {
       isAdmin: faker.datatype.boolean(),
     };
   };
+
   const seedUsers = async () => {
     const userPromises = Array.from({ length: 20 }, () => createUser());
     const users = await Promise.all(userPromises);
@@ -70,71 +71,59 @@ const seed = async () => {
     await prisma.movie.createMany({ data: movies });
   };
 
-  const createReview = async () => {
-    const reviews = [
-      {
-        subject: "Boring",
-        description: "Suspendisse commodo lorem mi, id maximus elit tincidunt ut...",
-        movieId: 3,
-        userId: 1
-      },
-      {
-        subject: "This blew me away!",
-        description: "Suspendisse commodo lorem mi, id maximus elit tincidunt ut...",
-        movieId: 2,
-        userId: 2
-      },
-      {
-        subject: "Wow...unbelievable",
-        description: "Suspendisse commodo lorem mi, id maximus elit tincidunt ut...",
-        movieId: 1,
-        userId: 3
-      },
-      {
-        subject: "What an ending!",
-        description: "Suspendisse commodo lorem mi, id maximus elit tincidunt ut...",
-        movieId: 4,
-        userId: 1
-      },
-      {
-        subject: "Intense!",
-        description: "Suspendisse commodo lorem mi, id maximus elit tincidunt ut...",
-        movieId: 5,
-        userId: 3
-      }
-    ];
+  const seedReviews = async () => {
+    const users = await prisma.user.findMany({ select: { id: true } });
+    const movies = await prisma.movie.findMany({ select: { id: true } });
+
+    const reviews = Array.from({ length: 40 }, () => ({
+      subject: faker.company.buzzPhrase(),
+      description: faker.lorem.paragraph(),
+      movieId: faker.helpers.arrayElement(movies).id,
+      userId: faker.helpers.arrayElement(users).id,
+    }));
+
     await prisma.review.createMany({ data: reviews });
   };
 
-  const createComment = async () => {
-    const comments = [
-      {
-        subject: "I disagree with this review",
-        description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit...",
-        reviewId: 3,
-        userId: 2
-      },
-      {
-        subject: "Something else to add to the above..",
-        description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit...",
-        reviewId: 2,
-        userId: 3
-      },
-      {
-        subject: "You totally forgot!",
-        description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit...",
-        reviewId: 3,
-        userId: 1
-      }
-    ];
+  const seedComment = async () => {
+    const users = await prisma.user.findMany({ select: { id: true } });
+    const reviews = await prisma.review.findMany({ select: { id: true } });
+
+    const comments = Array.from({ length: 20 }, () => ({
+      subject: faker.company.buzzPhrase(),
+      description: faker.lorem.paragraph(),
+      reviewId: faker.helpers.arrayElement(reviews).id,
+      userId: faker.helpers.arrayElement(users).id,
+    }));
+    await prisma.comment.createMany({ data: comments });
+    // await prisma.review.createMany({ data: reviews });
+    // [
+    //   {
+    //     subject: "I disagree with this review",
+    //     description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit...",
+    //     reviewId: 3,
+    //     userId: 2
+    //   },
+    //   {
+    //     subject: "Something else to add to the above..",
+    //     description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit...",
+    //     reviewId: 2,
+    //     userId: 3
+    //   },
+    //   {
+    //     subject: "You totally forgot!",
+    //     description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit...",
+    //     reviewId: 3,
+    //     userId: 1
+    //   }
+    // ];
     await prisma.comment.createMany({ data: comments });
   };
 
   await seedUsers();
-  // await createUser();
   await createMovie();
-  await createReview();
-  await createComment();
+  await seedReviews();
+  await seedComment();
 };
 
 seed()
