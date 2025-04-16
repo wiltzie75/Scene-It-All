@@ -20,25 +20,37 @@ router.get('/:id/watchlist', async(req, res) => {
 })
 
 // add item to watchlist
-router.post('/watchlist', async(req, res) => {
+router.post('/', async(req, res) => {
     const { userId, movieId } = req.body;
     try{
-        const addFavorite = await prisma.favorite.create({
-            data: {
-                user: { connect: { id: userId }},
-                movie: { connect: { id: movieId }},
-            }
-        });
+    
+        const user = await prisma.user.findUnique({ where: { id: userId } });
+    if (!user) {
+      return res.status(404).json({ error: `User with ID ${userId} not found.` });
+    }
 
-        res.status(201).json(addFavorite);
+
+    const movie = await prisma.movie.findUnique({ where: { id: movieId } });
+    if (!movie) {
+      return res.status(404).json({ error: `Movie with ID ${movieId} not found.` });
+    }
+
+    const addFavorite = await prisma.favorite.create({
+        data: {
+            userId,
+            movieId,
+        },
+    });
+
+    res.status(201).json(addFavorite);
     } catch (error) {
         console.log(error);
         res.status(500).send('Server error')
     }
-})
+});
 
 // delete item from watchlist
-router.delete('/:id/watchlist', async(req, res) => {
+router.delete('/:userId/:movieId', async(req, res) => {
     const { userId, movieId } = req.params;
     try{
         await prisma.favorite.delete({
