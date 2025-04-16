@@ -1,6 +1,10 @@
 import { faker } from '@faker-js/faker';
-
 import prisma from './index.js';
+import axios from 'axios';
+import dotenv from 'dotenv';
+import readline from 'readline';
+
+dotenv.config();
 
 const seed = async () => {
 
@@ -20,55 +24,126 @@ const seed = async () => {
     await prisma.user.createMany({ data: users });
   };
 
-  const createMovie = async () => {
-    const movies = [
-      {
-        title: "Jaws",
-        imdbId: "3",
-        plot: "When a massive killer shark unleashes chaos on a beach community off Long Island, it's up to a local sheriff, a marine biologist, and an old seafarer to hunt the beast down.",
-        poster: "https://m.media-amazon.com/images/I/616z7DnWGmL.jpg",
-        year: "1975",
-        genre: "Thriller",
-        userId: 2
-      },
-      {
-        title: "Interstellar",
-        imdbId: "4",
-        plot: "When Earth becomes uninhabitable in the future, a farmer and ex-NASA pilot, Joseph Cooper, is tasked to pilot a spacecraft, along with a team of researchers, to find a new planet for humans.",
-        poster: "http://www.impawards.com/2014/posters/interstellar.jpg",
-        year: "2014",
-        genre: "Drama",
-        userId: 1
-      },
-      {
-        title: "The Goonies",
-        imdbId: "1",
-        plot: "A group of young misfits called The Goonies discover an ancient map and set out on an adventure to find a legendary pirate's long-lost treasure.",
-        poster: "https://filmartgallery.com/cdn/shop/files/The-Goonies-Vintage-Movie-Poster-Original_b5fcc321.jpg?height=1024&v=1741576154&width=1024",
-        year: "1985",
-        genre: "Comedy",
-        userId: 3
-      },
-      {
-        title: "The Trial",
-        imdbId: "6",
-        plot: "An unassuming office worker is arrested and stands trial, but he is never made aware of his charges.",
-        poster: "https://cdn.posteritati.com/posters/000/000/026/214/the-trial-md-web.jpg",
-        year: "1962",
-        genre: "Drama",
-        userId: 1
-      },
-      {
-        title: "Vertigo",
-        imdbId: "5",
-        plot: "A former San Francisco police detective juggles wrestling with his personal demons and becoming obsessed with the hauntingly beautiful woman he has been hired to trail, who may be deeply disturbed.",
-        poster: "https://render.fineartamerica.com/images/rendered/medium/poster/5/8/break/images/artworkimages/medium/3/vertigo-1958-mystery-thriller-romance-retro-movie-poster-upscaled.jpg",
-        year: "1958",
-        genre: "Thriller",
-        userId: 2
+  const topMovieIds = [
+    'tt0111161', // The Shawshank Redemption
+    'tt0068646', // The Godfather
+    'tt0071562', // The Godfather: Part II
+    'tt0468569', // The Dark Knight
+    'tt0050083', // 12 Angry Men
+    'tt0108052', // Schindler's List
+    'tt0167260', // The Lord of the Rings: The Return of the King
+    'tt0110912', // Pulp Fiction
+    'tt0060196', // The Good, the Bad and the Ugly
+    'tt0109830', // Forrest Gump
+    'tt0120737', // The Lord of the Rings: The Fellowship of the Ring
+    'tt0137523', // Fight Club
+    'tt0167261', // The Lord of the Rings: The Two Towers
+    'tt0080684', // Star Wars: Episode V - The Empire Strikes Back
+    'tt0133093', // The Matrix
+    'tt0099685', // Goodfellas
+    'tt0073486', // One Flew Over the Cuckoo's Nest
+    'tt0047478', // Seven Samurai
+    'tt0114369', // Se7en
+    'tt0317248', // City of God
+    'tt0076759', // Star Wars: Episode IV - A New Hope
+    'tt0102926', // The Silence of the Lambs
+    'tt0038650', // It's a Wonderful Life
+    'tt0118799', // Life Is Beautiful
+    'tt0120689', // The Green Mile
+    'tt0120815', // Saving Private Ryan
+    'tt0816692', // Interstellar
+    'tt0245429', // Spirited Away
+    'tt0120586', // American History X
+    'tt0110413', // Léon: The Professional
+    'tt0114814', // The Usual Suspects
+    'tt0056058', // Harakiri
+    'tt0110357', // The Lion King
+    'tt0088763', // Back to the Future
+    'tt0253474', // The Pianist
+    'tt0103064', // Terminator 2: Judgment Day
+    'tt0027977', // Modern Times
+    'tt0054215', // Psycho
+    'tt0172495', // Gladiator
+    'tt0021749', // City Lights
+    'tt0407887', // The Departed
+    'tt1675434', // The Intouchables
+    'tt0482571', // The Prestige
+    'tt0064116', // Once Upon a Time in the West
+    'tt0095327', // Grave of the Fireflies
+    'tt0034583', // Casablanca
+    'tt0095765', // Cinema Paradiso
+    'tt0047396', // Rear Window
+    'tt0078748', // Alien
+  ];
+
+  async function getAPIKey() {
+    // First check if API key is in environment variables
+    const apiKey = process.env.OMDB_API_KEY;
+    if (apiKey) {
+      return apiKey;
+    }
+  
+    // If not, prompt the user
+    const rl = readline.createInterface({
+      input: process.stdin,
+      output: process.stdout
+    });
+  
+    return new Promise((resolve) => {
+      rl.question('Please enter your OMDb API key: ', (answer) => {
+        rl.close();
+        resolve(answer);
+      });
+    });
+  };
+
+  async function fetchTopMovies(apiKey) {
+    console.log(`Fetching top 50 movies from OMDb API...`);
+    const baseUrl = 'https://www.omdbapi.com/';
+    const movies = [];
+  
+    for (const imdbId of topMovieIds) {
+      try {
+        const response = await axios.get(baseUrl, {
+          params: {
+            apikey: apiKey,
+            i: imdbId,
+            plot: 'full'
+          }
+        });
+  
+        if (response.data.Response === 'True') {
+          movies.push(response.data);
+          console.log(`Fetched movie ${movies.length}/50: ${response.data.Title} (${response.data.Year})`);
+        } else {
+          console.warn(`Failed to fetch movie with ID ${imdbId}: ${response.data.Error}`);
+        }
+  
+        // Respect API rate limits
+        await new Promise(resolve => setTimeout(resolve, 100));
+      } catch (error) {
+        console.error(`Error fetching movie with ID ${imdbId}:`, error.message);
       }
-    ];
-    await prisma.movie.createMany({ data: movies });
+    }
+  
+    console.log(`Successfully fetched ${movies.length} top movies`);
+    return movies;
+  };
+
+  const seedMovies = async (movies, userId) => {
+    const formatted = movies.map(movie => ({
+      imdbId: movie.imdbID,
+      title: movie.Title,
+      plot: movie.Plot || null,
+      poster: movie.Poster !== 'N/A' ? movie.Poster : null,
+      year: movie.Year,
+      genre: movie.Genre,
+      imdbRating: movie.imdbRating !== 'N/A' ? parseFloat(movie.imdbRating) : null,
+      imdbVotes: movie.imdbVotes !== 'N/A' ? movie.imdbVotes : null,
+      userId
+    }));
+  
+    await prisma.movie.createMany({ data: formatted });
   };
 
   const seedReviews = async () => {
@@ -96,32 +171,15 @@ const seed = async () => {
       userId: faker.helpers.arrayElement(users).id,
     }));
     await prisma.comment.createMany({ data: comments });
-    // await prisma.review.createMany({ data: reviews });
-    // [
-    //   {
-    //     subject: "I disagree with this review",
-    //     description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit...",
-    //     reviewId: 3,
-    //     userId: 2
-    //   },
-    //   {
-    //     subject: "Something else to add to the above..",
-    //     description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit...",
-    //     reviewId: 2,
-    //     userId: 3
-    //   },
-    //   {
-    //     subject: "You totally forgot!",
-    //     description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit...",
-    //     reviewId: 3,
-    //     userId: 1
-    //   }
-    // ];
-    await prisma.comment.createMany({ data: comments });
   };
 
   await seedUsers();
-  await createMovie();
+  const users = await prisma.user.findMany();
+  const adminUser = users.find(u => u.isAdmin) || users[0];
+
+  const apiKey = await getAPIKey();
+  const movies = await fetchTopMovies(apiKey);
+  await seedMovies(movies, adminUser.id);
   await seedReviews();
   await seedComment();
 };
