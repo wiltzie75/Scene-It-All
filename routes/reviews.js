@@ -27,32 +27,61 @@ router.get('/movie/:movieId', async (req, res) => {
       res.status(500).send('Server error');
     }
   });
-  // create review
-  router.post('/',async(req,res) => {
-    const { content, rating,movieId } = req.body;
-    try{
-        const review = await prisma.review.create({
-            data:{
-                content,
-                rating : parseFloat(rating),
-                movie : { connect : { id : Number(movieId)}}
-            },
-        });
-        res.status(201).json(review);
-    }catch(error){
-        console.error(error);
-        res.status(500).send('Server error')
+
+  // create review 
+  router.post('/', async (req, res) => {
+    const { subject, description, rating, movieId, userId } = req.body;
+    try {
+      const review = await prisma.review.create({
+        data: {
+          subject,
+          description,
+          rating: parseFloat(rating),
+          movie: { connect: { id: Number(movieId) } },
+          user: { connect: { id: Number(userId) } },
+        },
+      });
+      res.status(201).json(review);
+    } catch (error) {
+      console.error('Error creating review:', error);
+      res.status(500).json({ message: 'Server error', error: error.message });
     }
   });
+
+  // create comment
+  
+  router.post('/:reviewId/comments', async (req, res) => {
+    const { reviewId } = req.params;
+    const { subject, description, userId } = req.body;
+  
+    try {
+      const comment = await prisma.comment.create({
+        data: {
+          subject,
+          description,
+          user: { connect: { id: Number(userId) } },
+          review: { connect: { id: Number(reviewId) } },
+        },
+      });
+      res.status(201).json(comment);
+    } catch (error) {
+      console.error('Error creating comment:', error);
+      res.status(500).json({ message: 'Server error', error: error.message });
+    }
+  });
+
+
   // edit review
   router.put('/:id',async(req,res)=>{
     const { id } = req.params;
-    const { content, rating } = req.body;
+    const { subject, description, comments, rating } = req.body;
     try{
         const updated = await prisma.review.update({
             where: {id: Number(id)},
             data:{
-                content,
+                subject,
+                description,
+                comments: comments || undefined,
                 rating : parseFloat(rating),
             },
         });
