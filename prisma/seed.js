@@ -1,31 +1,21 @@
-const prisma = require('./index');
+import { faker } from '@faker-js/faker';
+
+import prisma from './index.js';
 
 const seed = async () => {
 
   const createUser = async () => {
-    const users = [
-      {
-        firstName: "Emma",
-        lastName: "Stone",
-        email: "estone@mail.com",
-        password: "password",
-        isAdmin: true
-      },
-      {
-        firstName: "Timothee",
-        lastName: "Chalamet",
-        email: "timtim@gmail.com",
-        password: "password",
-        isAdmin: false
-      },
-      {
-        firstName: "Nicholas",
-        lastName: "Cage",
-        email: "ncage@yahoo.com",
-        password: "password",
-        isAdmin: true
-      }
-    ];
+    return {
+      firstName: faker.person.firstName(),
+      lastName: faker.person.lastName(),
+      email: faker.internet.email(),
+      password: faker.internet.password(),
+      isAdmin: faker.datatype.boolean(),
+    };
+  };
+  const seedUsers = async () => {
+    const userPromises = Array.from({ length: 20 }, () => createUser());
+    const users = await Promise.all(userPromises);
     await prisma.user.createMany({ data: users });
   };
 
@@ -140,7 +130,8 @@ const seed = async () => {
     await prisma.comment.createMany({ data: comments });
   };
 
-  await createUser();
+  await seedUsers();
+  // await createUser();
   await createMovie();
   await createReview();
   await createComment();
