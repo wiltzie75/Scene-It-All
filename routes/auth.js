@@ -1,8 +1,8 @@
-const express = require('expess');
+const express = require('express');
 const router = express.Router();
 const { PrismaClient } = require('@prisma/client');
 const bcrypt = require ('bcrypt');
-const jwt = require(' jsonwebtoken');
+const jwt = require('jsonwebtoken');
 
 const prisma = new PrismaClient();
 const JWT_SECRET = "secret_key_123";
@@ -62,3 +62,5 @@ router.post('/login',async(req,res)=>{
     }
     
 });
+
+module.exports = router;
