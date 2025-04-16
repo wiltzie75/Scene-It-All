@@ -78,9 +78,18 @@ router.put('/:id',async (req,res) => {
 router.delete('/:id',async(req,res)=>{
     const{ id } = req.params;
     try{
-        await prisma.movie.delete({
-            where:{ id : Number(id)},
-        });
+        await prisma.review.deleteMany({
+            where: {
+              movieId: parseInt(id),
+            },
+          });
+      
+          // Then delete the movie
+          await prisma.movie.delete({
+            where: {
+              id: parseInt(id),
+            },
+          });
         res.json({message :` Movie with ID ${id} deleted`});
     } catch(error){
         console.error(error);
