@@ -13,7 +13,7 @@ router.get ('/',async(req,res) => {
     }
 }
 );
-// get sigle movie
+// get single movie
 router.get('/:id',async(req, res) => {
     const {id} = req.params;
     try{
@@ -30,17 +30,18 @@ router.get('/:id',async(req, res) => {
 });
 // create a new movie
 router.post('/',async(req, res)=> {
-    const { title, description, image, year, genre, rating, review } = req.body;
+    const { title, plot, poster, year, genre, userRatings, reviews, userId } = req.body;
     try{
         const newMovie = await prisma.movie.create({
             data:{
                 title,
-                description,
-                image,
+                plot,
+                poster,
                 year,
                 genre,
-                rating,
-                review
+                userRatings,
+                reviews,
+                userId
             },
         });
          res.status(201).json(newMovie);
@@ -53,18 +54,18 @@ router.post('/',async(req, res)=> {
 //update movie
 router.put('/:id',async (req,res) => {
     const {id} = req.params;
-    const { title, description, image, year, genre, rating, review } = req.body;
+    const { title, plot, poster, year, genre, userRatings, reviews } = req.body;
     try{
         const updateMovie = await prisma.movie.update({
             where : {id : Number(id)},
             data : {
                 title,
-                description,
-                image,
+                plot,
+                poster,
                 year,
                 genre,
-                rating,
-                review,
+                userRatings,
+                reviews
             },
     });
       res.json(updateMovie);

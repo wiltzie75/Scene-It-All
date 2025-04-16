@@ -37,13 +37,14 @@ router.get('/', async (req, res) => {
   });
   // create user (register)
   router.post('/', async (req, res) => {
-    const { email, password, name } = req.body;
+    const { firstName, lastName, email, password } = req.body;
     try {
       const user = await prisma.user.create({
         data: {
+          firstName,
+          lastName,
           email,
-          password,
-          name,
+          password  
         },
       });
       res.status(201).json(user);
@@ -55,15 +56,16 @@ router.get('/', async (req, res) => {
   //  update user
   router.put('/:id', async (req, res) => {
     const { id } = req.params;
-    const { email, password, name, role } = req.body;
+    const { firstName, lastName, email, password, isAdmin } = req.body;
     try {
       const updatedUser = await prisma.user.update({
         where: { id: Number(id) },
         data: {
+          firstName,
+          lastName,
           email,
           password,
-          name,
-          role,
+          isAdmin
         },
       });
       res.json(updatedUser);
@@ -72,14 +74,33 @@ router.get('/', async (req, res) => {
       res.status(500).send('Server error');
     }
   });
-  // remove user
+
   router.delete('/:id', async (req, res) => {
     const { id } = req.params;
+    const userId = Number(id);
+  
     try {
-      await prisma.user.delete({
-        where: { id: Number(id) },
+      const userMovies = await prisma.movie.findMany({
+        where: { userId },
+        select: { id: true }
       });
-      res.json({ message: `User ${id} deleted.` });
+      const userMovieIds = userMovies.map(movie => movie.id);
+  
+      await prisma.review.deleteMany({
+        where: { movieId: { in: userMovieIds } }
+      });
+  
+      await prisma.comment.deleteMany({ where: { userId } });
+      await prisma.review.deleteMany({ where: { userId } });
+      await prisma.userRating.deleteMany({ where: { userId } });
+      await prisma.favorite.deleteMany({ where: { userId } });
+      await prisma.movie.deleteMany({ where: { userId } });
+  
+      const deletedUser = await prisma.user.delete({
+        where: { id: userId }
+      });
+  
+      res.json({ message: `User ${id} deleted`, user: deletedUser });
     } catch (error) {
       console.error(error);
       res.status(500).send('Server error');
