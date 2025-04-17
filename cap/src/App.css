@@ -40,3 +40,37 @@
 .read-the-docs {
   color: #888;
 }
+
+
+
+.slider-container {
+  overflow: hidden;
+  width: 100%;
+  background-color: #141414;
+}
+
+.slider {
+  display: flex;
+  animation: scroll 15s linear infinite;
+}
+
+.slider-item {
+  min-width: 150px;
+  margin: 10px;
+  text-align: center;
+  color: white;
+}
+
+.slider-item img {
+  width: 100%;
+  border-radius: 8px;
+}
+
+@keyframes scroll {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-100%);
+  }
+}
