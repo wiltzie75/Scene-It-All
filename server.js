@@ -3,7 +3,11 @@ const app = express();
 const movieRoutes = require('./routes/movie');
 const reviewRoutes = require('./routes/reviews');
 const userRoutes = require('./routes/users');
+const authRoutes = require('./routes/auth');
+const commentsRoutes = require('./routes/comments');
+const watchlistRoutes = require('./routes/watchlist');
 
+// set api
 // Use middleware to parse JSON request body
 app.use(express.json());
 
@@ -11,7 +15,10 @@ app.use(express.json());
 app.use('/api/movies', movieRoutes);
 app.use('/api/reviews', reviewRoutes);
 app.use('/api/users', userRoutes);
-
+app.use('/api/auth',authRoutes);
+app.use('/api/comments',commentsRoutes);
+app.use('/api/watchlist', watchlistRoutes);
+ 
 // Set the server port and start the server
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
