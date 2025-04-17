@@ -23,7 +23,7 @@ const Login = () => {
 
       if (res.ok) {
         localStorage.setItem("token", data.token);
-        navigate("/movies");
+        navigate("/profile");
       } else {
         setError(data.message || "Login failed");
       }

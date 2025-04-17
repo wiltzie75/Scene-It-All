@@ -38,6 +38,27 @@ router.get('/', async (req, res) => {
       res.status(500).send('Server error');
     }
   });
+
+  // login user
+  router.post('/login', async (req, res, next) => {
+    try {
+      const { email, password } = req.body;
+      const user = await prisma.user.findUnique({
+        where: 
+          {email} });
+        if(!user) return res.json({error: "no user found"})
+        
+          const passwordCheck = await bcrypt.compare(password, user.password)
+          if(!passwordCheck) return res.json({error: "incorrect password :("})
+
+            const token = jwt.sign({ id: user.id }, process.env.JWT);
+            res.json({token});
+      } catch (error) {
+        next(error);
+      }
+    })
+
+
   // create user (register)
   router.post('/', async (req, res) => {
     const { firstName, lastName, email, password } = req.body;
