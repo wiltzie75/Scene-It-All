@@ -2,7 +2,13 @@ import { useState } from "react";
 import "./App.css";
 import { Routes, Route, Navigate } from "react-router-dom";
 import { Box, Container } from "@mui/material";
-import Movies from './components/Movies';
+import Navbar from "../components/Navbar
+import Login from "../components/Login";
+import Register from "../components/Register";
+import Profile from "../components/Profile";
+import TopRated from "/TopRated";
+
+import Movies from '../components/Movies';
 
 function App() {
   const [count, setCount] = useState(0);
@@ -19,7 +25,15 @@ function App() {
 
       <Container sx={{ flex: 1, mt: 4 }}>
         <Routes>
+          <Route path="/" element={<Navigate to="/movies" />} />
+          <Route path="/movies" element={<Movies />} />
+          <Route path="/login" element={<Login />} />
+          <Route path="/register" element={<Register />} />
+          <Route path="/profile" element={<Profile />} />
+          <Route path="/top-rated" element={<TopRated />} />
+
           <Route path="/" element={<Movies />} />
+
           {/* <Route path="/top rated" element={<TopRated />} /> */}
           {/* <Route
             path="/admin"
