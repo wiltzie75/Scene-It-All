@@ -1,14 +1,14 @@
-import { useState } from 'react';
-import './App.css';
+import { useState } from "react";
+import "./App.css";
 import { Routes, Route, Navigate } from "react-router-dom";
 import { Box, Container } from "@mui/material";
 import Movies from './components/Movies';
 
 function App() {
-  const [count, setCount] = useState(0)
+  const [count, setCount] = useState(0);
 
   return (
-      <Box
+    <Box
       sx={{
         display: "flex",
         flexDirection: "column",
@@ -30,7 +30,7 @@ function App() {
 
       {/* <Footer /> */}
     </Box>
-  )
+  );
 }
 
-export default App
+export default App;
