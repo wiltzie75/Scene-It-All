@@ -3,10 +3,9 @@ import "./App.css";
 import { Routes, Route, Navigate } from "react-router-dom";
 import { Box, Container } from "@mui/material";
 // import Navbar from "../components/Navbar";
-// import Login from "../components/Login";
 import Register from "./components/Register"
 import Login from "./components/Login";
-// import Profile from "../components/Profile";
+import Profile from "./components/Profile";
 // import TopRated from "/TopRated";
 import Movies from "./components/Movies";
 
@@ -29,7 +28,7 @@ function App() {
           <Route path="/" element={<Movies />} />
           <Route path="/users/register" element={<Register token={token} setToken={setToken}/>} />
           <Route path="/users/login" element={<Login token={token} setToken={setToken} />} />
-          // {/* <Route path="/profile" element={<Profile />} /> */}
+          <Route path="/profile" element={<Profile />} />
           // {/* <Route path="/top rated" element={<TopRated />} /> */}
           // {/* <Route
           //   path="/admin"
