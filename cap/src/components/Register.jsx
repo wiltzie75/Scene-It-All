@@ -11,12 +11,11 @@ const RegisterUser = ({ setToken }) => {
 
     async function registerAccount(email, password, firstName, lastName) {
         try {
-            const response = await fetch(`${API}/users/register`, {
+            const response = await fetch(`${API}/users`, {
                 method: "POST",
                 headers: {"Content-Type": "application/json"},
                 body: JSON.stringify({email, password, firstName, lastName}),
             });
-            console.log(response);
             const result = await response.json();
             console.log("successfully logged in", result)
             return (
