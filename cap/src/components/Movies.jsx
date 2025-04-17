@@ -9,7 +9,7 @@ const Movies = () => {
     // Replace this with your API URL
     const fetchMovies = async () => {
       try {
-        const response = await fetch(`${API}/movie`);
+        const response = await fetch(`${API}/movies`);
         const data = await response.json();
         console.log(data);
         
