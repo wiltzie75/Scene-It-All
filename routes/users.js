@@ -2,6 +2,9 @@ const express = require('express');
 const router = express.Router();
 const { PrismaClient } = require('@prisma/client');
 const prisma = new PrismaClient();
+const bcrypt = require('bcrypt');
+const jwt = require('jsonwebtoken');
+const JWT = process.env.JWT;
 // get all users
 router.get('/', async (req, res) => {
     try {
@@ -35,21 +38,43 @@ router.get('/', async (req, res) => {
       res.status(500).send('Server error');
     }
   });
+
+  // login user
+  router.post('/login', async (req, res, next) => {
+    try {
+      const { email, password } = req.body;
+      const user = await prisma.user.findUnique({
+        where: 
+          {email} });
+        if(!user) return res.json({error: "no user found"})
+        
+          const passwordCheck = await bcrypt.compare(password, user.password)
+          if(!passwordCheck) return res.json({error: "incorrect password :("})
+
+            const token = jwt.sign({ id: user.id }, process.env.JWT);
+            res.json({token});
+      } catch (error) {
+        next(error);
+      }
+    })
+
+
   // create user (register)
   router.post('/', async (req, res) => {
     const { firstName, lastName, email, password } = req.body;
     try {
+      const hashedPassword = await bcrypt.hash(password, 10);
       const user = await prisma.user.create({
         data: {
           firstName,
           lastName,
           email,
-          password  
+          password: hashedPassword, 
         },
       });
       res.status(201).json(user);
     } catch (error) {
-      console.error(error);
+      console.error("❌ Error creating user:", error.message);
       res.status(500).send('Server error');
     }
   });

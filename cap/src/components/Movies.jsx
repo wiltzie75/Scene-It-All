@@ -11,7 +11,7 @@ const Movies = () => {
       try {
         const response = await fetch(`${API}/movies`);
         const data = await response.json();
-        console.log(data);
+        
         setMovies(data);
       } catch (error) {
         console.error('Error fetching movies:', error);
