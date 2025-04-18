@@ -2,7 +2,7 @@ import { useState } from "react";
 import "./App.css";
 import { Routes, Route, Navigate } from "react-router-dom";
 import { Box, Container } from "@mui/material";
-// import Navbar from "../components/Navbar";
+import Navbar from "./components/Navbar";
 import Register from "./components/Register"
 import Login from "./components/Login";
 import Profile from "./components/Profile";
@@ -21,7 +21,7 @@ function App() {
         minHeight: "100vh",
       }}
     >
-      {/* <Navbar /> */}
+      <Navbar />
 
       <Container sx={{ flex: 1, mt: 4 }}>
         <Routes>
