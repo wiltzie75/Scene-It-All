@@ -25,9 +25,14 @@ const Profile = () => {
     useEffect(() => {
         async function getProfile() {
             const token = localStorage.getItem("token");
+            if (!token) {
+                navigate("/login"); // optional
+                return;
+            }
+    
             const APIResponse = await fetchProfile(token);
-            if (APIResponse?.user) {
-                setProfile(APIResponse.user);
+            if (APIResponse) {
+                setProfile(APIResponse);
             }
         }
         getProfile();

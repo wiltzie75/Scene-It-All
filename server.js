@@ -9,7 +9,9 @@ const commentsRoutes = require('./routes/comments');
 const watchlistRoutes = require('./routes/watchlist');
 // const recentReviewsRoutes = require('./routes/recentReviews');
 // const topRatedRoutes = require('./routes/topRated');
+const profileRoutes = require('./routes/profile');
 app.use(cors({ origin: "*" }));
+require('dotenv').config();
 // set api
 // Use middleware to parse JSON request body
 app.use(express.json());
@@ -21,7 +23,7 @@ app.use('/api/users', userRoutes);
 app.use('/api/auth',authRoutes);
 app.use('/api/comments',commentsRoutes);
 app.use('/api/watchlist', watchlistRoutes);
-// app.use('/api/recentReviews', recentReviewsRoutes);
+app.use('/api/profile', profileRoutes);
 // app.use('/api/topRated', topRatedRoutes);
  
 // Set the server port and start the server
@@ -29,3 +31,5 @@ const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
+
+app.use('/profile', profileRoutes);
