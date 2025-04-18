@@ -13,6 +13,7 @@ const Profile = () => {
         firstName: "",
         lastName: ""
     });
+    const [users, setUsers] = useState([]);
 
     const fetchProfile = async (token) => {
         try {
@@ -116,12 +117,16 @@ const Profile = () => {
                     <div>
                         <h2>Admin Panel</h2>
                         <div>
+                            {users && users.userIds.map((userId)) => (
                             <ul>
                                 <li></li>
                                 <li></li>
                                 <li></li>
                                 <li></li>
+                                <li></li>
+                                <li></li>
                             </ul>
+                            )}
                         </div>
                     
                     </div>
