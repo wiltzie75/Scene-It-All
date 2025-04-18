@@ -8,6 +8,31 @@ const Profile = () => {
     const [profile, setProfile] = useState({});
     const [favorites, setFavorites] = useState([]);
 
+    const fetchProfile = async (token) => {
+        try {
+            const response = await fetch(`${API}/profile`, {
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": `Bearer ${token}`},
+                });
+                const result = await response.json();
+                return result;
+        } catch (error) {
+            console.error(error);
+        }
+    };
+
+    useEffect(() => {
+        async function getProfile() {
+            const token = localStorage.getItem("token");
+            const APIResponse = await fetchProfile(token);
+            if (APIResponse?.user) {
+                setProfile(APIResponse.user);
+            }
+        }
+        getProfile();
+    }, []);
+
     useEffect(() => {
         const fetchFavorites = async () => {
             try {
