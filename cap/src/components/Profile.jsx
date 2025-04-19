@@ -45,6 +45,28 @@ const Profile = () => {
         getProfile();
     }, []);
 
+    useEffect(() => {
+        const fetchUsers = async () => {
+            try {
+                const token = localStorage.getItem("token");
+                const res = await fetch(`${API}/users`, {
+                    headers: {
+                        "Authorization": `Bearer ${token}`,
+                        "Content-Type": "application/json"
+                    }
+                });
+                const data = await res.json();
+                setUsers(data);
+            } catch (err) {
+                console.error("Error fetching users:", err);
+            }
+        };
+    
+        if (profile.isAdmin) {
+            fetchUsers();
+        }
+    }, [profile.isAdmin]);
+
     return ( 
         <>
             <div style={{border: '1px solid black'}}>
@@ -117,16 +139,13 @@ const Profile = () => {
                     <div>
                         <h2>Admin Panel</h2>
                         <div>
-                            {users && users.userIds.map((userId)) => (
                             <ul>
-                                <li></li>
-                                <li></li>
-                                <li></li>
-                                <li></li>
-                                <li></li>
-                                <li></li>
+                            {users && users.map((user) => (
+                                <li key={user.id}>
+                                    {user.firstName} {user.lastName} | {user.email} | Admin: {user.isAdmin ? "Yes" : "No"}
+                                </li>
+                            ))}
                             </ul>
-                            )}
                         </div>
                     
                     </div>
