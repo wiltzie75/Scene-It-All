@@ -35,6 +35,10 @@ export default function Navbar() {
           </Typography>
 
           <Button color="inherit" component={Link} to="/">
+            Home
+          </Button>
+
+          <Button color="inherit" component={Link} to="/Movies">
             Movies
           </Button>
 

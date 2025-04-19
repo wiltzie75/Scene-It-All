@@ -1,18 +1,4 @@
-/* #root {
-  max-width: 100%;
-  margin: 0 auto;
-  padding: 2rem;
-  text-align: center;
-} */
-
-html, body {
-  margin: 0;
-  padding: 0;
-  width: 100vw;
-  height: 100vh;
-  overflow: hidden;
-  background-color: #000; /* Optional: solid background */
-}
+@import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&display=swap');
 
 #root {
   margin: 0;
@@ -22,6 +8,15 @@ html, body {
   overflow: hidden;
   display: flex;
   flex-direction: column;
+}
+
+html, body {
+  margin: 0;
+  padding: 0;
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+  background-color: #000; /* Optional: solid background */
 }
 
 .logo {
@@ -195,4 +190,19 @@ html, body {
   100% {
     transform: translate(100px, -100px); /* Diagonal up-right drift */
   }
+}
+
+.site-title {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: clamp(2rem, 8vw, 6rem); /* responsive font size */
+  color: white;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 10;
+  text-align: center;
+  letter-spacing: 0.1em;
+  text-shadow: 2px 2px 10px rgba(0, 0, 0, 0.8);
+  margin: 0;
 }

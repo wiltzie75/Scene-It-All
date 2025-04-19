@@ -8,6 +8,7 @@ import Register from "./components/Register"
 import Login from "./components/Login";
 import Profile from "./components/Profile";
 // import TopRated from "/TopRated";
+import Home from "./components/Home";
 import Movies from "./components/Movies";
 
   function App() {
@@ -27,7 +28,8 @@ import Movies from "./components/Movies";
 
         <Container sx={{ flex: 1, mt: 4 }}>
           <Routes>
-            <Route path="/" element={<Movies />} />
+            <Route path="/" element={<Home />} />
+            <Route path="/Movies" element={<Movies />} />
             <Route path="/users/register" element={<Register token={token} setToken={setToken}/>} />
             <Route path="/users/login" element={<Login token={token} setToken={setToken} />} />
             <Route path="/profile" element={<Profile />} />
