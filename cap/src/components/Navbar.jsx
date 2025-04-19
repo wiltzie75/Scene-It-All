@@ -28,7 +28,7 @@ export default function Navbar() {
 
   return (
     <>
-      <AppBar position="static">
+      <AppBar position="fixed" sx={{ zIndex: 10 }}>
         <Toolbar>
           <Typography variant="h5" sx={{ flex: 1}}>
             Scene It All

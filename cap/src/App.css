@@ -1,8 +1,27 @@
-#root {
+/* #root {
   max-width: 100%;
   margin: 0 auto;
   padding: 2rem;
   text-align: center;
+} */
+
+html, body {
+  margin: 0;
+  padding: 0;
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+  background-color: #000; /* Optional: solid background */
+}
+
+#root {
+  margin: 0;
+  padding: 0;
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
 }
 
 .logo {
@@ -146,4 +165,34 @@
 .movie-info img {
   max-width: 200px;
   margin-bottom: 10px;
+}
+
+.floating-wrapper {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 0;
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+  background-color: #000;
+}
+
+.floating-poster {
+  position: absolute;
+  animation-name: drift;
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
+  pointer-events: none;
+  border-radius: 8px;
+}
+
+/* Simple side-to-side + vertical drift */
+@keyframes drift {
+  0% {
+    transform: translate(0, 0);
+  }
+  100% {
+    transform: translate(100px, -100px); /* Diagonal up-right drift */
+  }
 }
