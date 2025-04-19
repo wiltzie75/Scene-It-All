@@ -1,7 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import API from "../api/api";
-import Movies from "./Movies";
 import { border } from "@mui/system";
 
 const Profile = () => {
@@ -13,6 +12,7 @@ const Profile = () => {
         firstName: "",
         lastName: ""
     });
+    const [users, setUsers] = useState([]);
 
     const fetchProfile = async (token) => {
         try {
@@ -44,6 +44,53 @@ const Profile = () => {
         getProfile();
     }, []);
 
+    useEffect(() => {
+        const fetchUsers = async () => {
+            try {
+                const token = localStorage.getItem("token");
+                const res = await fetch(`${API}/users`, {
+                    headers: {
+                        "Authorization": `Bearer ${token}`,
+                        "Content-Type": "application/json"
+                    }
+                });
+                const data = await res.json();
+                setUsers(data);
+            } catch (err) {
+                console.error("Error fetching users:", err);
+            }
+        };
+    
+        if (profile.isAdmin) {
+            fetchUsers();
+        }
+    }, [profile.isAdmin]);
+
+    // function that handles boolean toggle for Admin users
+    const handleAdminToggle = async (userId, currentStatus) => {
+        const token = localStorage.getItem("token");
+        
+        try {
+            const response = await fetch(`${API}/users/${userId}`, {
+                method: "PUT",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": `Bearer ${token}`
+                },
+                body: JSON.stringify({ isAdmin: !currentStatus})
+            });
+
+            if (response.ok) {
+                const updatedUsers = users.map((u) => 
+                u.id === userId ? { ...u, isAdmin: !currentStatus } : u 
+            );
+            setUsers(updatedUsers);
+            }
+        } catch (error) {
+            console.error("Failed to toggle admin:", error);
+        }
+    }
+
     return ( 
         <>
             <div style={{border: '1px solid black'}}>
@@ -56,6 +103,7 @@ const Profile = () => {
                 )}
             </div>
 
+            {/* Displays users favorite movies */}
             <div style={{border: '1px solid black'}}>
                 {profile && profile.favorites.length === 0 ? (
                     <div>
@@ -74,6 +122,7 @@ const Profile = () => {
                 )}
             </div>
 
+            {/* Displays users reviews */}
             <div style={{border: '1px solid black'}}>
                 {profile && profile.reviews.length === 0 ? (
                     <div>
@@ -92,7 +141,7 @@ const Profile = () => {
                 )}
             </div>
 
-
+            {/* Displays users comments */}
             <div style={{border: '1px solid black'}}>
                 {profile && profile.comments.length === 0 ? (
                     <div>
@@ -111,16 +160,21 @@ const Profile = () => {
                 )}
             </div>
 
+            {/* For Admin users, this will display a list of users, their review counts and Admin status */}
             <div style={{border: '1px solid black'}}>
                 {profile && profile.isAdmin === true && (
                     <div>
                         <h2>Admin Panel</h2>
                         <div>
                             <ul>
-                                <li></li>
-                                <li></li>
-                                <li></li>
-                                <li></li>
+                            {users && users.map((user) => (
+                                <li key={user.id}>
+                                    {user.firstName} {user.lastName} | {user.email} | Reviews: {user.reviews?.length || 0 } | Admin: {user.isAdmin ? "Yes" : "No"}{ " " }
+                                    <button onClick={() => handleAdminToggle(user.id, user.isAdmin)}>
+                                        {user.isAdmin ? "Revoke Admin" : "Make Admin"}
+                                    </button>
+                                </li>
+                            ))}
                             </ul>
                         </div>
                     
