@@ -35,31 +35,18 @@ const Profile = (props) => {
         }
     };
 
-    async function getProfile() {
+    const getProfile = async () => {
         const token = localStorage.getItem("token");
         if (!token) {
             navigate("/login");
             return;
-
-    useEffect(() => {
-        async function getProfile() {
-            const token = localStorage.getItem("token");
-            if (!token) {
-                navigate("/login");
-                return;
-            }
-    
-            const APIResponse = await fetchProfile(token);
-            if (APIResponse) {
-                setProfile(APIResponse);
-            }
         }
-
+    
         const APIResponse = await fetchProfile(token);
         if (APIResponse) {
             setProfile(APIResponse);
         }
-    }
+    };
     
     useEffect(() => {
         getProfile();
@@ -343,44 +330,6 @@ const Profile = (props) => {
                                         <button onClick={() => removeComment(comment.id)}>Delete</button>
                                     </>
                                 )}
-                            </div>
-                        ))}
-                    </div>
-                )}
-            </div>
-
-            {/* Displays users reviews */}
-            <div style={{border: '1px solid black'}}>
-                {profile && profile.reviews.length === 0 ? (
-                    <div>
-                        <h3>You have no reviews</h3>
-                    </div>
-                ) : (
-                    <div>
-                        <h3>My Reviews</h3>
-                        {profile.reviews.map((review) => (
-                            <div key={review.id}>
-                                <h4>{review.movie?.title}</h4>
-                                <p>{review.subject}: {review.description}</p>
-                            </div>
-                        ))}
-                    </div>
-                )}
-            </div>
-
-            {/* Displays users comments */}
-            <div style={{border: '1px solid black'}}>
-                {profile && profile.comments.length === 0 ? (
-                    <div>
-                        <h3>You have no comments</h3>
-                    </div>
-                ) : (
-                    <div>
-                        <h3>My Comments</h3>
-                        {profile.comments.map((comment) => (
-                            <div key={comment.id}>
-                                <h4>{comment.review?.movie?.title}</h4>
-                                <p>{comment.subject}: {comment.description}</p>
                             </div>
                         ))}
                     </div>
