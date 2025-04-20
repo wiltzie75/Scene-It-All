@@ -162,6 +162,10 @@ html, body {
   margin-bottom: 10px;
 }
 
+ul {
+  list-style-type: none;
+}
+
 .floating-wrapper {
   position: absolute;
   top: 0;

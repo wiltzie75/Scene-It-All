@@ -1,9 +1,11 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import API from "../api/api";
-import { border } from "@mui/system";
+// import { border } from "@mui/system";
 
-const Profile = () => {
+
+
+const Profile = (props) => {
     const navigate = useNavigate();
     const [profile, setProfile] = useState({
         favorites: [],
@@ -13,6 +15,11 @@ const Profile = () => {
         lastName: ""
     });
     const [users, setUsers] = useState([]);
+
+    const [editedReview, setEditedReview] = useState({ subject: "", description: "" });
+    const [editingReviewId, setEditingReviewId] = useState(null);
+    const [editedComment, setEditedComment] = useState({ subject: "", description: "" });
+    const [editingCommentId, setEditingCommentId] = useState(null);
 
     const fetchProfile = async (token) => {
         try {
@@ -28,19 +35,20 @@ const Profile = () => {
         }
     };
 
-    useEffect(() => {
-        async function getProfile() {
-            const token = localStorage.getItem("token");
-            if (!token) {
-                navigate("/login");
-                return;
-            }
-    
-            const APIResponse = await fetchProfile(token);
-            if (APIResponse) {
-                setProfile(APIResponse);
-            }
+    const getProfile = async () => {
+        const token = localStorage.getItem("token");
+        if (!token) {
+            navigate("/login");
+            return;
         }
+    
+        const APIResponse = await fetchProfile(token);
+        if (APIResponse) {
+            setProfile(APIResponse);
+        }
+    };
+    
+    useEffect(() => {
         getProfile();
     }, []);
 
@@ -91,6 +99,117 @@ const Profile = () => {
         }
     }
 
+    const handleReviewEdit = (review) => {
+        setEditingReviewId(review.id);
+        setEditedReview({ subject: review.subject, description: review.description});
+    };
+
+    const handleReviewSave = async (reviewId) => {
+        try {
+            const token = localStorage.getItem("token");
+            const res = await fetch(`${API}/reviews/${reviewId}`, {
+                method: "PUT",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": `Bearer ${token}`,
+                },
+                body: JSON.stringify({
+                    subject: editedReview.subject,
+                    description: editedReview.description
+                }),
+            });
+
+            if (res.ok) {
+                await getProfile(); 
+                const updatedReviews = profile.reviews.map((r) => 
+                    r.id === reviewId ? { ...r, ...editedReview } : r
+                );
+                setProfile({ ...profile, reviews: updatedReviews });
+                setEditingReviewId(null);
+                setEditedReview({ subject: "", description: "" });
+            }
+        } catch (error) {
+            console.error("Failed to update review:", error);
+        }
+    };
+
+    const handleReviewCancel = () => {
+        setEditingReviewId(null);
+        setEditedReview({ subject: "", description: "" });
+    };
+
+    async function removeReview(reviewId) {
+        try {
+            const token = localStorage.getItem("token");
+            const response = await fetch(`${API}/reviews/${reviewId}`, {
+                method: "DELETE",
+                headers: {
+                    "Authorization": `Bearer ${token}`
+                }
+            });
+            if (response.ok) {
+                await getProfile();
+            }
+        } catch (error) {
+            console.error(error);
+        }    
+    }
+
+    const handleCommentEdit = (comment) => {
+        setEditingCommentId(comment.id);
+        setEditedComment({ subject: comment.subject, description: comment.description});
+    };
+
+    const handleCommentSave = async (commentId) => {
+        try {
+            const token = localStorage.getItem("token");
+            const res = await fetch(`${API}/comments/${commentId}`, {
+                method: "PUT",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": `Bearer ${token}`,
+                },
+                body: JSON.stringify({
+                    subject: editedComment.subject,
+                    description: editedComment.description
+                }),
+            });
+
+            if (res.ok) {
+                await getProfile(); 
+                const updatedComments = profile.comments.map((c) => c
+                );
+                setProfile({ ...profile, comments: updatedComments });
+                setEditingCommentId(null);
+                setEditedComment({ subject: "", description: "" });
+            }
+        } catch (error) {
+            console.error("Failed to update comment:", error);
+        }
+    };
+
+    const handleCommentCancel = () => {
+        setEditingCommentId(null);
+        setEditedComment({ subject: "", description: ""});
+    };
+
+    async function removeComment(commentId) {
+        try {
+            const token = localStorage.getItem("token");
+            const response = await fetch(`${API}/comments/${commentId}`, {
+                method: "DELETE",
+                headers: {
+                    "Authorization": `Bearer ${token}`
+                }
+            });
+            if (response.ok) {
+                await getProfile();
+            }
+        } catch (error) {
+            console.error(error);
+        }    
+    }
+
     return ( 
         <>
             <div style={{border: '1px solid black'}}>
@@ -116,6 +235,7 @@ const Profile = () => {
                             <div key={movie.id}>
                                 <img src={movie.movie?.poster} alt={movie.movie?.title} />
                                 <h4>{movie.movie?.title}</h4>
+                                <p>Ratings: {movie.movie?.imdbRating}{movie.movie?.userRatings}</p>
                             </div>
                         ))}
                     </div>
@@ -134,7 +254,35 @@ const Profile = () => {
                         {profile.reviews.map((review) => (
                             <div key={review.id}>
                                 <h4>{review.movie?.title}</h4>
-                                <p>{review.subject}: {review.description}</p>
+                               {editingReviewId === review.id ? (
+                                    <div>
+                                        <input
+                                            type="text"
+                                            placeholder="Subject"
+                                            value={editedReview.subject}
+                                            onChange={(e) =>
+                                                setEditedReview({ ...editedReview, subject: e.target.value })
+                                            }
+                                        />
+                                        <br />
+                                        <textarea
+                                            placeholder="Description"
+                                            value={editedReview.description}
+                                            onChange={(e) =>
+                                                setEditedReview({ ...editedReview, description: e.target.value })
+                                            }
+                                        />
+                                        <br />
+                                        <button onClick={() => handleReviewSave(review.id)}>Save</button>
+                                        <button onClick={handleReviewCancel}>Cancel</button>
+                                    </div>
+                                ) : (
+                                    <>
+                                        <p>{review.subject}: {review.description}</p>
+                                        <button onClick={() => handleReviewEdit(review)}>Edit</button>
+                                        <button onClick={() => removeReview(review.id)}>Delete</button>
+                                    </>
+                                )}
                             </div>
                         ))}
                     </div>
@@ -153,7 +301,35 @@ const Profile = () => {
                         {profile.comments.map((comment) => (
                             <div key={comment.id}>
                                 <h4>{comment.review?.movie?.title}</h4>
-                                <p>{comment.subject}: {comment.description}</p>
+                                {editingCommentId === comment.id ? (
+                                    <div>
+                                        <input
+                                            type="text"
+                                            placeholder="Subject"
+                                            value={editedComment.subject}
+                                            onChange={(e) =>
+                                                setEditedComment({ ...editedComment, subject: e.target.value })
+                                            }
+                                        />
+                                        <br />
+                                        <textarea
+                                            placeholder="Description"
+                                            value={editedComment.description}
+                                            onChange={(e) =>
+                                                setEditedComment({ ...editedComment, description: e.target.value })
+                                            }
+                                        />
+                                        <br />
+                                        <button onClick={() => handleCommentSave(comment.id)}>Save</button>
+                                        <button onClick={handleCommentCancel}>Cancel</button>
+                                    </div>
+                                ) : (
+                                    <>
+                                        <p>{comment.subject}: {comment.description}</p>
+                                        <button onClick={() => handleCommentEdit(comment)}>Edit</button>
+                                        <button onClick={() => removeComment(comment.id)}>Delete</button>
+                                    </>
+                                )}
                             </div>
                         ))}
                     </div>

@@ -28,7 +28,6 @@ model Movie {
   userId Int
   user User? @relation(fields: [userId], references: [id], onDelete: Cascade)
   favorites Favorite[]
-
 }
 
 model Review {
@@ -65,12 +64,11 @@ model User {
   ratings UserRating[]
   favorites Favorite[]
   isAdmin Boolean @default(false)
-  
 }
 
 model UserRating {
   id        String   @id @default(uuid())
-  score     Int
+  score     Float
   review    String?  @db.Text
   movie     Movie    @relation(fields: [movieId], references: [id], onDelete: Cascade)
   movieId   Int
@@ -87,4 +85,3 @@ model Favorite {
   userId    Int
   @@unique([userId, movieId])
 }
-
