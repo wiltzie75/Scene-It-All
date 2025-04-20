@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import API from "../api/api";
-import { border } from "@mui/system";
+// import { border } from "@mui/system";
 
 const Profile = (props) => {
     const navigate = useNavigate();
@@ -13,15 +13,10 @@ const Profile = (props) => {
         lastName: ""
     });
     const [users, setUsers] = useState([]);
-    const [editingReviewId, setEditingReviewId] = useState({
-        subject: "",
-        description: ""
-    });
-    const [editedComment, setEditedComment] = useState("");
-    const [editingCommentId, setEditingCommentId] = useState({
-        subject: "",
-        description: ""
-    });
+    const [editedReview, setEditedReview] = useState({ subject: "", description: "" });
+    const [editingReviewId, setEditingReviewId] = useState(null);
+    const [editedComment, setEditedComment] = useState({ subject: "", description: "" });
+    const [editingCommentId, setEditingCommentId] = useState(null);
 
     const fetchProfile = async (token) => {
         try {
@@ -37,19 +32,20 @@ const Profile = (props) => {
         }
     };
 
-    useEffect(() => {
-        async function getProfile() {
-            const token = localStorage.getItem("token");
-            if (!token) {
-                navigate("/login");
-                return;
-            }
-    
-            const APIResponse = await fetchProfile(token);
-            if (APIResponse) {
-                setProfile(APIResponse);
-            }
+    async function getProfile() {
+        const token = localStorage.getItem("token");
+        if (!token) {
+            navigate("/login");
+            return;
         }
+
+        const APIResponse = await fetchProfile(token);
+        if (APIResponse) {
+            setProfile(APIResponse);
+        }
+    }
+    
+    useEffect(() => {
         getProfile();
     }, []);
 
@@ -121,12 +117,14 @@ const Profile = (props) => {
             });
 
             if (res.ok) {
+                await getProfile(); 
                 const updatedReviews = profile.reviews.map((r) => 
-                    r.id === reviewId ? { ...r, description: editedReview } : r
+                    r.id === reviewId ? { ...r, ...editedReview } : r
                 );
                 setProfile({ ...profile, reviews: updatedReviews });
                 setEditingReviewId(null);
                 setEditedReview({ subject: "", description: "" });
+                navigate("/profile");
             }
         } catch (error) {
             console.error("Failed to update review:", error);
@@ -140,9 +138,16 @@ const Profile = (props) => {
 
     async function removeReview(reviewId) {
         try {
+            const token = localStorage.getItem("token");
             const response = await fetch(`${API}/reviews/${reviewId}`, {
-                method: "DELETE"
+                method: "DELETE",
+                headers: {
+                    "Authorization": `Bearer ${token}`
+                }
             });
+            if (response.ok) {
+                await getProfile();
+            }
         } catch (error) {
             console.error(error);
         }    
@@ -150,7 +155,7 @@ const Profile = (props) => {
 
     const handleCommentEdit = (comment) => {
         setEditingCommentId(comment.id);
-        setEditedReview({ subject: comment.subject, description: comment.description});
+        setEditedComment({ subject: comment.subject, description: comment.description});
     };
 
     const handleCommentSave = async (commentId) => {
@@ -169,8 +174,8 @@ const Profile = (props) => {
             });
 
             if (res.ok) {
-                const updatedComments = profile.comments.map((c) => 
-                    c.id === commentId ? { ...c, description: editedComment } : r
+                await getProfile(); 
+                const updatedComments = profile.comments.map((c) => c
                 );
                 setProfile({ ...profile, comments: updatedComments });
                 setEditingCommentId(null);
@@ -188,9 +193,16 @@ const Profile = (props) => {
 
     async function removeComment(commentId) {
         try {
+            const token = localStorage.getItem("token");
             const response = await fetch(`${API}/comments/${commentId}`, {
-                method: "DELETE"
+                method: "DELETE",
+                headers: {
+                    "Authorization": `Bearer ${token}`
+                }
             });
+            if (response.ok) {
+                await getProfile();
+            }
         } catch (error) {
             console.error(error);
         }    
