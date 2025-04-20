@@ -127,7 +127,6 @@ const Profile = (props) => {
                 setProfile({ ...profile, reviews: updatedReviews });
                 setEditingReviewId(null);
                 setEditedReview({ subject: "", description: "" });
-                navigate("/profile");
             }
         } catch (error) {
             console.error("Failed to update review:", error);
@@ -136,7 +135,7 @@ const Profile = (props) => {
 
     const handleReviewCancel = () => {
         setEditingReviewId(null);
-        setEditedReview("");
+        setEditedReview({ subject: "", description: "" });
     };
 
     async function removeReview(reviewId) {
@@ -191,7 +190,7 @@ const Profile = (props) => {
 
     const handleCommentCancel = () => {
         setEditingCommentId(null);
-        setEditedComment("");
+        setEditedComment({ subject: "", description: ""});
     };
 
     async function removeComment(commentId) {
@@ -236,6 +235,7 @@ const Profile = (props) => {
                             <div key={movie.id}>
                                 <img src={movie.movie?.poster} alt={movie.movie?.title} />
                                 <h4>{movie.movie?.title}</h4>
+                                <p>Ratings: {movie.movie?.imdbRating}{movie.movie?.userRatings}</p>
                             </div>
                         ))}
                     </div>
