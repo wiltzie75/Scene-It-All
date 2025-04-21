@@ -10,6 +10,7 @@ import Profile from "./components/Profile";
 // import TopRated from "/TopRated";
 import Movies from "./components/Movies";
 
+
   function App() {
     const [count, setCount] = useState(0);
     const [token, setToken] = useState(null);
@@ -38,6 +39,7 @@ import Movies from "./components/Movies";
              /> */}
           </Routes>
         </Container>
+       
 
         {/* <Footer /> */}
       </Box>
