@@ -127,12 +127,7 @@ const MyReviews = () => {
             console.error(error);
         }    
     }
-
-    const handleCommentEdit = (comment) => {
-        setEditingCommentId(comment.id);
-        setEditedComment({ subject: comment.subject, description: comment.description});
-    };
-
+    
     return ( 
         <>
         {/* Displays users reviews */}

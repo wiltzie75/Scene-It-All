@@ -3,17 +3,9 @@ const router = express.Router();
 const { PrismaClient } = require('@prisma/client');
 const prisma = new PrismaClient();
 
-router.get('/movies/toprated', async (req, res) => {
+router.get('/', async (req, res) => {
   try {
     const topRated = await prisma.movie.findMany({
-      take: 10,
-      orderBy: {
-        reviews: {
-          _avg: {
-            rating: 'desc',
-          },
-        },
-      },
       where: {
         reviews: {
           some: {
@@ -35,18 +27,21 @@ router.get('/movies/toprated', async (req, res) => {
     });
 
     // average
-    const result = topRated.map((movie) => {
+    const result = topRated
+    .map((movie) => {
       const ratings = movie.reviews.map((r) => r.rating);
       const average = ratings.length
-        ? (ratings.reduce((a, b) => a + b, 0) / ratings.length).toFixed(2)
-        : null;
+        ? ratings.reduce((a, b) => a + b, 0) / ratings.length
+        : 0;
       return {
         id: movie.id,
         title: movie.title,
-        averageRating: average,
+        averageRating: parseFloat(average.toFixed(2)),
         reviewCount: ratings.length,
       };
-    });
+    })
+    .sort((a, b) => b.averageRating - a.averageRating)
+    .slice(0, 10);
 
     res.json(result); 
   } catch (error) {
