@@ -1,6 +1,7 @@
 const express = require('express');
 const cors = require("cors");
 const app = express(); 
+
 const movieRoutes = require('./routes/movie');
 const reviewRoutes = require('./routes/reviews');
 const userRoutes = require('./routes/users');
