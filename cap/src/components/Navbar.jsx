@@ -25,27 +25,24 @@ export default function Navbar() {
   };
 
   return (
-    <AppBar
-      position="fixed" 
-      sx={{ height: "64px", justifyContent: "center" }}
-    >
-      <Toolbar sx={{ minHeight: "64px !important" }}>
-        <Typography variant="h5" sx={{ flex: 1}}>
-          Scene It All
-        </Typography>
+    <>
+      <AppBar position="fixed" sx={{ zIndex: 10 }}>
+        <Toolbar>
+          <Typography variant="h5" sx={{ flex: 1}}>
+            Scene It All
+          </Typography>
 
-        <Button color="inherit" component={Link} to="/">
-          Movies
-        </Button>
-        <Button color="inherit" component={Link} to="/top rated">
-          Top Rated
-        </Button>
-        <Button color="inherit" component={Link} to="/users/register">
-          Register
-        </Button>
-        <Button color="inherit" component={Link} to="/users/login">
-          Login
-        </Button>
+          <Button color="inherit" component={Link} to="/">
+            Home
+          </Button>
+
+          <Button color="inherit" component={Link} to="/Movies">
+            Movies
+          </Button>
+
+          <Button color="inherit" component={Link} to="/">
+            Top Rated
+          </Button>
 
         <Box sx={{ ml: 2 }}>
           {isLoggedIn ? (
