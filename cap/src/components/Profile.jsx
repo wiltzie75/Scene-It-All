@@ -99,11 +99,13 @@ const Profile = (props) => {
         }
     }
 
+    // function that allows user to edit reviews
     const handleReviewEdit = (review) => {
         setEditingReviewId(review.id);
         setEditedReview({ subject: review.subject, description: review.description});
     };
 
+    // function that allows user to save edited reviews
     const handleReviewSave = async (reviewId) => {
         try {
             const token = localStorage.getItem("token");
@@ -133,11 +135,13 @@ const Profile = (props) => {
         }
     };
 
+    // function that allows user to cancel editing a review
     const handleReviewCancel = () => {
         setEditingReviewId(null);
         setEditedReview({ subject: "", description: "" });
     };
 
+    // function that allows a user to delete a review they have written
     async function removeReview(reviewId) {
         try {
             const token = localStorage.getItem("token");
@@ -155,11 +159,13 @@ const Profile = (props) => {
         }    
     }
 
+    // function that allows a user to edit comments they have written
     const handleCommentEdit = (comment) => {
         setEditingCommentId(comment.id);
         setEditedComment({ subject: comment.subject, description: comment.description});
     };
 
+    // function that allows a user to save edited comments
     const handleCommentSave = async (commentId) => {
         try {
             const token = localStorage.getItem("token");
@@ -188,11 +194,13 @@ const Profile = (props) => {
         }
     };
 
+    // function that lets user cancel editing comments
     const handleCommentCancel = () => {
         setEditingCommentId(null);
         setEditedComment({ subject: "", description: ""});
     };
 
+    // function that allows user to delete comments they have written
     async function removeComment(commentId) {
         try {
             const token = localStorage.getItem("token");
@@ -235,7 +243,7 @@ const Profile = (props) => {
                             <div key={movie.id}>
                                 <img src={movie.movie?.poster} alt={movie.movie?.title} />
                                 <h4>{movie.movie?.title}</h4>
-                                <p>Ratings: {movie.movie?.imdbRating}{movie.movie?.userRatings}</p>
+                                <p>Ratings: {movie.movie?.imdbRating} My rating: {movie.movie?.userRatings}</p>
                             </div>
                         ))}
                     </div>
