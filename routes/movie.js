@@ -1,7 +1,6 @@
 const express = require('express');
 const router = express.Router();
 const prisma = require('../prisma');
-const movieRoutes = require('./routes/movie');
 // get all movies
 router.get ('/',async(req,res) => {
     try {
