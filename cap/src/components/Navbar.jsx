@@ -37,7 +37,7 @@ export default function Navbar() {
         <Button color="inherit" component={Link} to="/">
           Movies
         </Button>
-        <Button color="inherit" component={Link} to="/">
+        <Button color="inherit" component={Link} to="/top rated">
           Top Rated
         </Button>
         <Button color="inherit" component={Link} to="/users/register">
