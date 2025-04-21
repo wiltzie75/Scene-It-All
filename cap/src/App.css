@@ -207,6 +207,10 @@ ul {
   z-index: 10;
   text-align: center;
   letter-spacing: 0.1em;
-  text-shadow: 2px 2px 10px rgba(0, 0, 0, 0.8);
+  text-shadow: 2px 5px 5px #EF233C;
   margin: 0;
+}
+
+.navbar {
+  color: #8D99AE;
 }
