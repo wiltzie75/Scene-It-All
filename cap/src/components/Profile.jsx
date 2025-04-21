@@ -120,7 +120,7 @@ const Profile = (props) => {
                             <div key={movie.id}>
                                 <img src={movie.movie?.poster} alt={movie.movie?.title} />
                                 <h4>{movie.movie?.title}</h4>
-                                <p>Ratings: {movie.movie?.imdbRating}{movie.movie?.userRatings}</p>
+                                <p>Ratings: {movie.movie?.imdbRating} My rating: {movie.movie?.userRatings}</p>
                             </div>
                         ))}
                     </div>
