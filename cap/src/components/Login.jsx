@@ -40,7 +40,7 @@ const Login = () => {
         },
         body: JSON.stringify({ email, password }),
       });
-
+      console.log(res);
       const data = await res.json();
 
       if (res.ok) {

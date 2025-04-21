@@ -68,7 +68,7 @@ model User {
 
 model UserRating {
   id        String   @id @default(uuid())
-  score     Int
+  score     Float
   review    String?  @db.Text
   movie     Movie    @relation(fields: [movieId], references: [id], onDelete: Cascade)
   movieId   Int
