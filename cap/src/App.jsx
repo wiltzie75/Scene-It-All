@@ -10,6 +10,9 @@ import Profile from "./components/Profile";
 // import TopRated from "/TopRated";
 import Home from "./components/Home";
 import Movies from "./components/Movies";
+import MyReviews from "./components/MyReviews";
+import MyComments from "./components/MyComments";
+import Users from "./components/Users";
 
   function App() {
     const [count, setCount] = useState(0);
@@ -30,9 +33,12 @@ import Movies from "./components/Movies";
           <Routes>
             <Route path="/" element={<Home />} />
             <Route path="/Movies" element={<Movies />} />
-            <Route path="/users/register" element={<Register token={token} setToken={setToken}/>} />
-            <Route path="/users/login" element={<Login token={token} setToken={setToken} />} />
+            <Route path="/register" element={<Register token={token} setToken={setToken}/>} />
+            <Route path="/login" element={<Login token={token} setToken={setToken} />} />
             <Route path="/profile" element={<Profile />} />
+            <Route path="/myreviews" element={<MyReviews />} />
+            <Route path="/mycomments" element={<MyComments />} />
+            <Route path="/users" element={<Users />} />
             {/* <Route path="/top rated" element={<TopRated />} /> */}
             {/* <Route
             path="/admin"

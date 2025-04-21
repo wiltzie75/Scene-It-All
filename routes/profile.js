@@ -8,7 +8,6 @@ const JWT = process.env.JWT;
 const verifyToken = require('./verify');
 
 router.get('/', verifyToken, async (req, res) => {
-    console.log('🔍 Decoded user from token:', req.user);
     const { id: userId } = req.user;
 
     if (!userId || isNaN(Number(userId))) {
@@ -19,8 +18,20 @@ router.get('/', verifyToken, async (req, res) => {
       const user = await prisma.user.findUnique({
         where: { id: Number(userId) },
         include: {
-          reviews: true,
-          comments: true,
+          reviews: {
+            include: {
+              movie: true
+            }
+          },
+          comments: {
+            include: {
+              review: {
+                include: {
+                  movie: true,
+                },
+              },
+            },
+          },
           favorites: {
             include: {
               movie: true,
