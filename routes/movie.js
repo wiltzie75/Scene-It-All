@@ -56,7 +56,7 @@ router.put('/:id',async (req,res) => {
     const { title, plot, poster, year, genre, userRatings, reviews } = req.body;
     try{
         const updateMovie = await prisma.movie.update({
-            where : {id : Number(id)},
+            where : {id : id},
             data : {
                 title,
                 plot,
