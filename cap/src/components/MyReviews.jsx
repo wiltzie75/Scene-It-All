@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import API from "../api/api";
 
-const RecentReviews = () => {
+const MyReviews = () => {
 
     const navigate = useNavigate();
     const [profile, setProfile] = useState({
@@ -185,4 +185,4 @@ const RecentReviews = () => {
      );
 }
  
-export default RecentReviews;
+export default MyReviews;
