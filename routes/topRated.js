@@ -1,53 +1,58 @@
 const express = require('express');
 const router = express.Router();
-const { PrismaClient } = require ('@prisma/client');
+const { PrismaClient } = require('@prisma/client');
 const prisma = new PrismaClient();
 
-router.get('/',async( req, res ) => {
-    const limit = parseInt(req.query.limit) || 10;
-    try{  
-        const topRatedMovies = await prisma.userRating.groupBy({
-            by :['movieId'],
-            _avg : {
-                score: true,
+router.get('/movies/toprated', async (req, res) => {
+  try {
+    const topRated = await prisma.movie.findMany({
+      take: 10,
+      orderBy: {
+        reviews: {
+          _avg: {
+            rating: 'desc',
+          },
+        },
+      },
+      where: {
+        reviews: {
+          some: {
+            rating: {
+              not: null,
             },
-            orderBy : {
-                 _avg:{
-                    score : 'desc',
-                 },
-            },
-            take: limit,
-         });
-         console.log('topRatedMovies', topRatedMovies);
+          },
+        },
+      },
+      select: {
+        id: true,
+        title: true,
+        reviews: {
+          select: {
+            rating: true,
+          },
+        },
+      },
+    });
 
-     const movies = await Promise.all(
+    // average
+    const result = topRated.map((movie) => {
+      const ratings = movie.reviews.map((r) => r.rating);
+      const average = ratings.length
+        ? (ratings.reduce((a, b) => a + b, 0) / ratings.length).toFixed(2)
+        : null;
+      return {
+        id: movie.id,
+        title: movie.title,
+        averageRating: average,
+        reviewCount: ratings.length,
+      };
+    });
 
-        topRatedMovies.map(async(item) => {
-
-             const movie = await prisma.movie.findUnique({
-
-                where :{ id: item.movieId },
-
-                });
-
-                return{
-
-                    ...movie,
-                    averageScore : item._avg.score,
-                };
-            })
-         );
-    res.status(200).json(movies);
-
-
-        }catch(error){
-            console.error ('Error getiing top rated movies : ',error);
-            res.status(500).json({ 
-                error : 'Server error ',
-                message : error.message,
-                stack : error.stack,
-            });
-        }
-    
+    res.json(result); 
+  } catch (error) {
+    console.error('Error getting top rated movies:', error);
+    res.status(500).json({ error: 'Server error' });
+  }
 });
-module.exports  = router; 
+
+module.exports = router;
