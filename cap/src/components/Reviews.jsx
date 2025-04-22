@@ -6,6 +6,8 @@ const Reviews = () => {
     const [reviews, setReviews] = useState([]);
     const [editedReview, setEditedReview] = useState({ subject: "", description: "" });
     const [editingReviewId, setEditingReviewId] = useState(null);
+    const [editedComment, setEditedComment] = useState({ subject: "", description: "" });
+    const [editingCommentId, setEditingCommentId] = useState(null);
     const [users, setUsers] = useState(JSON.parse(localStorage.getItem("user")));
     const [profile, setProfile] = useState({});
 
@@ -113,14 +115,116 @@ const Reviews = () => {
         }    
     }
 
+    const handleCommentEdit = (comment) => {
+        setEditingCommentId(comment.id);
+        setEditedComment({ subject: comment.subject, description: comment.description});
+    };
+
+    const handleCommentSave = async (reviewId, commentId) => {
+        try {
+            const token = localStorage.getItem("token");
+            const res = await fetch(`${API}/reviews/${reviewId}/comments/${commentId}`, {
+                method: "PUT",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": `Bearer ${token}`,
+                },
+                body: JSON.stringify({
+                    subject: editedComment.subject,
+                    description: editedComment.description
+                }),
+            });
+
+            if (res.ok) { 
+                const updatedReviews = reviews.map((review) => {
+                    if (review.id === reviewId) {
+                        const updatedComments = review.comments.map((comment) => 
+                            comment.id === commentId ? { ...comment, ...editedComment } : comment
+                        );
+                        return { ...review, comments: updatedComments };
+                    }
+                    return review;
+                });
+                
+                setReviews(updatedReviews);
+                setEditingCommentId(null);
+                setEditedComment({ subject: "", description: "" });
+            }
+        } catch (error) {
+            console.error("Failed to update comment:", error);
+        }
+    };
+
+    const handleCommentCancel = () => {
+        setEditingCommentId(null);
+        setEditedComment({ subject: "", description: "" });
+    };
+
+    async function removeComment(commentId) {
+        try {
+            const token = localStorage.getItem("token");
+            const response = await fetch(`${API}/reviews/${reviewId}/comments/${commentId}`, {
+                method: "DELETE",
+                headers: {
+                    "Authorization": `Bearer ${token}`
+                }
+            });
+            if (response.ok) {
+                const updatedReviews = reviews.map((review) => {
+                    if (review.id === reviewId) {
+                        const updatedComments = review.comments.filter(comment => comment.id !== commentId);
+                        return { ...review, comments: updatedComments };
+                    }
+                    return review;
+                });
+                
+                setReviews(updatedReviews);
+            }
+        } catch (error) {
+            console.error("Failed to delete comment:", error);
+        }     
+    }
+
     const renderComments = (review) => {
         return (
             <>
                 {Array.isArray(review.comments) && review.comments.length > 0 ? (
                     review.comments.map((comment) => (
-                        <div key={comment.id} style={{ marginLeft: "1rem", borderLeft: "2px solid #ccc", paddingLeft: "1rem" }}>
-                            <p><strong>{comment.subject}</strong></p>
-                            <p>{comment.description}</p>
+                        <div key={comment.id} style={{ marginLeft: "1rem", borderLeft: "2px solid #ccc", paddingLeft: "1rem", marginBottom: "1rem" }}>
+                            {editingCommentId === comment.id ? (
+                                <div>
+                                    <input
+                                        type="text"
+                                        placeholder="Subject"
+                                        value={editedComment.subject}
+                                        onChange={(e) =>
+                                            setEditedComment({ ...editedComment, subject: e.target.value })
+                                        }
+                                    />
+                                    <br />
+                                    <textarea
+                                        placeholder="Description"
+                                        value={editedComment.description}
+                                        onChange={(e) =>
+                                            setEditedComment({ ...editedComment, description: e.target.value })
+                                        }
+                                    />
+                                    <br />
+                                    <button onClick={() => handleCommentSave(review.id, comment.id)}>Save</button>
+                                    <button onClick={handleCommentCancel}>Cancel</button>
+                                </div>
+                            ) : (
+                                <>
+                                    <p><strong>{comment.subject}</strong></p>
+                                    <p>{comment.description}</p>
+                                    {users?.isAdmin && (
+                                        <div>
+                                            <button onClick={() => handleCommentEdit(comment)}>Edit Comment</button>
+                                            <button onClick={() => removeComment(review.id, comment.id)}>Delete Comment</button>
+                                        </div>
+                                    )}
+                                </>
+                            )}
                         </div>
                     ))
                 ) : (
@@ -169,11 +273,6 @@ const Reviews = () => {
                                     </div>
                                     <button onClick={() => handleReviewEdit(review)}>Edit</button>
                                     <button onClick={() => removeReview(review.id)}>Delete</button>
-
-                                    {/* <div>
-                                        <h5>Comments</h5>
-                                        {renderComments(review)}
-                                    </div> */}
                                 </div>
                             )}
                         </div>
