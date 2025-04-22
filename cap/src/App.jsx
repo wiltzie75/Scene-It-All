@@ -12,7 +12,8 @@ import Movies from "./components/Movies";
 import MyReviews from "./components/MyReviews";
 import MyComments from "./components/MyComments";
 import Users from "./components/Users";
-import AdminMovies from "./components/AdminMovies";
+import AdminMovies from './components/AdminMovies';
+import Reviews from "./components/Reviews";
 
 function App() {
   const [count, setCount] = useState(0);
@@ -45,33 +46,21 @@ function App() {
             </Link>
           </div>
         )}
-
-        <Routes>
-          <Route path="/" element={<Home />} />
-          <Route path="/Movies" element={<Movies />} />
-          <Route
-            path="/register"
-            element={<Register token={token} setToken={setToken} />}
-          />
-          <Route
-            path="/login"
-            element={<Login token={token} setToken={setToken} />}
-          />
-          <Route path="/profile" element={<Profile />} />
-          <Route path="/myreviews" element={<MyReviews />} />
-          <Route path="/mycomments" element={<MyComments />} />
-          <Route path="/users" element={<Users />} />
-          {/*  Only show the admin page if the user is an admin  */}
-          <Route
-            path="/admin"
-            element={user?.isAdmin ? <AdminMovies /> : <Navigate to="/" />}
-          />
-          <Route path="/top-rated" element={<TopRated />} />
-          //{" "}
-          {/* <Route
-            // path="/admin"
-            // element={isLoggedIn ? <AdminPanel /> : <Navigate to="/" />}
-            //  /> */}
+        
+          <Routes>
+            <Route path="/" element={<Home />} />
+            <Route path="/Movies" element={<Movies />} />
+            <Route path="/reviews" element={<Reviews />} />
+            <Route path="/register" element={<Register token={token} setToken={setToken}/>} />
+            <Route path="/top-rated" element={<TopRated />} />
+            <Route path="/login" element={<Login token={token} setToken={setToken} />} />
+            <Route path="/profile" element={<Profile />} />
+            <Route path="/myreviews" element={<MyReviews />} />
+            <Route path="/mycomments" element={<MyComments />} />
+            <Route path="/users" element={<Users />} />
+            
+            {/*  Only show the admin page if the user is an admin  */}
+            <Route path="/admin" element={user?.isAdmin ? <AdminMovies /> : <Navigate to="/" />} />
         </Routes>
       </Container>
 

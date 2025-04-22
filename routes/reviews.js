@@ -3,17 +3,21 @@ const router = express.Router();
 const { PrismaClient } = require("@prisma/client");
 const prisma = new PrismaClient();
 // get all reviews
-router.get("/", async (req, res) => {
-  try {
-    const reviews = await prisma.review.findMany({
-      include: { movie: true },
-    });
-    res.json(reviews);
-  } catch (error) {
-    console.error(error);
-    res.status(500).send("Server error");
-  }
+router.get('/',async(req,res)=>{
+    try{
+        const reviews = await prisma.review.findMany({
+            include: {
+              movie: true,
+              comments: true, 
+            },
+        });
+        res.json(reviews)
+    }catch(error) {
+        console.error(error);
+        res.status(500).send('Server error');
+    }
 });
+
 // get one review
 router.get("/movie/:movieId", async (req, res) => {
   const { movieId } = req.params;
@@ -48,9 +52,43 @@ router.post("/", async (req, res) => {
   }
 });
 
-// create comment
+// edit review
+router.put('/:id',async(req,res)=>{
+  const { id } = req.params;
+  const { subject, description, comments, rating } = req.body;
+  try{
+      const updated = await prisma.review.update({
+          where: {id: Number(id)},
+          data:{
+              subject,
+              description,
+              comments: comments || undefined,
+              rating : parseFloat(rating),
+          },
+      });
+      res.json(updated);
+  }catch(error){
+      console.error(error);
+      res.status(500).send('Server error');
+  }
+});
 
-router.post("/:reviewId/comments", async (req, res) => {
+// delete review
+router.delete('/:id',async(req,res) => {
+  const { id } = req.params;
+  try{
+      await prisma.review.delete({
+          where : { id: Number(id)},
+      });
+      res.json({message : `Review ${id} deleted.`});
+  } catch(error){
+      console.error(error);
+      res.status(500).send('Server error');
+  }
+});
+
+// create comment
+router.post('/:reviewId/comments', async (req, res) => {
   const { reviewId } = req.params;
   const { subject, description, userId } = req.body;
 
@@ -65,42 +103,76 @@ router.post("/:reviewId/comments", async (req, res) => {
     });
     res.status(201).json(comment);
   } catch (error) {
-    console.error("Error creating comment:", error);
-    res.status(500).json({ message: "Server error", error: error.message });
+    console.error('Error creating comment:', error);
+    res.status(500).json({ message: 'Server error', error: error.message });
   }
 });
 
-// edit review
-router.put("/:id", async (req, res) => {
-  const { id } = req.params;
-  const { subject, description, comments, rating } = req.body;
+// edit comment
+router.put('/:reviewId/comments/:commentId', async (req, res) => {
+  const { reviewId, commentId } = req.params;
+  const { subject, description } = req.body;
+
   try {
-    const updated = await prisma.review.update({
-      where: { id: Number(id) },
-      data: {
-        subject,
-        description,
-        comments: comments || undefined,
-        rating: parseFloat(rating),
-      },
+    const comment = await prisma.comment.findUnique({
+      where: { id: Number(commentId) },
+      include: { review: true },
     });
-    res.json(updated);
+
+    if (!comment) {
+      return res.status(404).json({ message: 'Comment not found' });
+    }
+
+    if (comment.review.id !== Number(reviewId)) {
+      return res.status(400).json({ message: 'Comment does not belong to this review' });
+    }
+  
+  // Update the comment
+  const updatedComment = await prisma.comment.update({
+    where: { id: Number(commentId) },
+    data: {
+      subject,
+      description,
+    },
+  });
+
+    res.json(updatedComment);
   } catch (error) {
-    console.error(error);
-    res.status(500).send("Server error");
+    console.error('Error updating comment:', error);
+    res.status(500).json({ message: 'Server error', error: error.message });
   }
 });
-// delete review
-router.delete("/:id", async (req, res) => {
-  const { id } = req.params;
+
+// Delete comments
+router.delete('/:reviewId/comments/:commentId', async (req, res) => {
+  const { reviewId, commentId } = req.params;
+
   try {
-    await prisma.review.delete({
-      where: { id: Number(id) },
+    // First, verify that the comment belongs to the specified review
+    const comment = await prisma.comment.findUnique({
+      where: { id: Number(commentId) },
+      include: { review: true },
     });
-    res.json({ message: `Review ${id} deleted.` });
+
+    if (!comment) {
+      return res.status(404).json({ message: 'Comment not found' });
+    }
+
+    if (comment.review.id !== Number(reviewId)) {
+      return res.status(400).json({ message: 'Comment does not belong to this review' });
+    }
+
+    // Delete the comment
+    await prisma.comment.delete({
+      where: { id: Number(commentId) },
+    });
+
+    res.json({ message: `Comment ${commentId} deleted.` });
   } catch (error) {
-    console.error(error);
-    res.status(500).send("Server error");
+    console.error('Error deleting comment:', error);
+    res.status(500).json({ message: 'Server error', error: error.message });
   }
 });
+
 module.exports = router;
+
