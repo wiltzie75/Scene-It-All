@@ -1,13 +1,12 @@
-
 import { useState } from "react";
 import "./App.css";
 import { Routes, Route, Navigate, Link } from "react-router-dom";
 import { Box, Container } from "@mui/material";
 import Navbar from "./components/Navbar";
-import Register from "./components/Register"
+import Register from "./components/Register";
 import Login from "./components/Login";
 import Profile from "./components/Profile";
-// import TopRated from "/TopRated";
+import TopRated from "./components/TopRated";
 import Home from "./components/Home";
 import Movies from "./components/Movies";
 import MyReviews from "./components/MyReviews";
@@ -16,19 +15,17 @@ import Users from "./components/Users";
 import AdminMovies from './components/AdminMovies';
 import Reviews from "./components/Reviews";
 
-
-  function App() {
-    const [count, setCount] = useState(0);
-    const [token, setToken] = useState(null);
-    let user = null;
-      try {
-        const storedUser = localStorage.getItem('user');
-        user = storedUser ? JSON.parse(storedUser) : null;
-      } catch (error) {
-        localStorage.removeItem("user");
-      }
-    const userRole = user?.isAdmin;
-
+function App() {
+  const [count, setCount] = useState(0);
+  const [token, setToken] = useState(null);
+  let user = null;
+  try {
+    const storedUser = localStorage.getItem("user");
+    user = storedUser ? JSON.parse(storedUser) : null;
+  } catch (error) {
+    localStorage.removeItem("user");
+  }
+  const userRole = user?.isAdmin;
 
   return (
     <Box
@@ -40,11 +37,10 @@ import Reviews from "./components/Reviews";
     >
       <Navbar />
 
-        <Container sx={{ flex: 1, mt: 4 }}>
-         
+      <Container sx={{ flex: 1, mt: 4 }}>
         {/* Only show "Go to Admin Page" button if user is admin */}
         {userRole === true && (
-          <div className="admin-button" style={{ marginBottom: '16px' }}>
+          <div className="admin-button" style={{ marginBottom: "16px" }}>
             <Link to="/admin">
               <button>Go to Admin Page</button>
             </Link>
@@ -56,6 +52,7 @@ import Reviews from "./components/Reviews";
             <Route path="/Movies" element={<Movies />} />
             <Route path="/reviews" element={<Reviews />} />
             <Route path="/register" element={<Register token={token} setToken={setToken}/>} />
+            <Route path="/top-rated" element={<TopRated />} />
             <Route path="/login" element={<Login token={token} setToken={setToken} />} />
             <Route path="/profile" element={<Profile />} />
             <Route path="/myreviews" element={<MyReviews />} />
@@ -64,23 +61,12 @@ import Reviews from "./components/Reviews";
             
             {/*  Only show the admin page if the user is an admin  */}
             <Route path="/admin" element={user?.isAdmin ? <AdminMovies /> : <Navigate to="/" />} />
-          
-        
-      
-  
-            
-            // {/* <Route path="/top rated" element={<TopRated />} /> */}
-            // {/* <Route
-            // path="/admin"
-            // element={isLoggedIn ? <AdminPanel /> : <Navigate to="/" />}
-            //  /> */}
-          </Routes>
-        </Container>
-       
+        </Routes>
+      </Container>
 
-        {/* <Footer /> */}
-      </Box>
-    );
-  }
+      {/* <Footer /> */}
+    </Box>
+  );
+}
 
-  export default App;
+export default App;
