@@ -1,6 +1,8 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import API from "../api/api";
+import { watchlist } from "../../../prisma";
+import { BottomNavigation } from "@mui/material";
 // import { border } from "@mui/system";
 
 
@@ -12,10 +14,12 @@ const Profile = (props) => {
         reviews: [],
         comments: [],
         firstName: "",
-        lastName: ""
+        lastName: "",
+        watchlist:[]
     });
     const [users, setUsers] = useState([]);
 
+    // Fetch profile data
     const fetchProfile = async (token) => {
         try {
             const response = await fetch(`${API}/profile`, {
@@ -92,7 +96,35 @@ const Profile = (props) => {
         } catch (error) {
             console.error("Failed to toggle admin:", error);
         }
-    }
+    };
+
+    const handleRemoveFromWatchlist = async (movieId) => {
+        const token = localStorage.getItem("token");
+        if (!token) {
+            return alert("You need to be logged in to remove movies to your Watchlist");
+        }
+        const userId = profile.id;
+
+        try {
+            const response = await fetch(`${API}/watchlist/${movieId}`, {
+                method: "DELETE",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": `Bearer ${token}`,
+                },
+                body: JSON.stringify({ movieId }), 
+            });
+
+            if (response.ok) {
+                alert("Movie removed from Watchlist!");
+                getProfile(); 
+            } else {
+                alert("Failed to remove movie from Watchlist");
+            }
+        } catch (error) {
+            console.error("Error removing movie from Watchlist:", error);
+        }
+    };
 
 
     return ( 
@@ -126,6 +158,36 @@ const Profile = (props) => {
                     </div>
                 )}
             </div>
+            
+            {/* Displays user's watchlist */}
+            <div style={{ border:'1px solid black', marginTop: '20px' }}>
+
+                {profile && profile.watchlist.length === 0 ? (
+                    <div>
+                        <h3>You have no movies in your Watchlist</h3>
+                    </div>
+                ) : (
+                    <div>
+                        <h3>My Watchlist</h3>
+                        {profile.watchlist?.map((movie) => (
+                            <div key={movie.id}>
+                                <img src={movie.poster} alt={movie.title} />
+                                <h4>{movie.title}</h4>
+                                <p>Ratings: {movie.imdbRating}</p>
+                                <button
+                                     onClick={()=> handleRemoveFromWatchlist(movie.id)}
+                                     style={{ backgroundColor: "red", color: "white", border: "none", padding: "5px 10px", cursor: "pointer" }}
+                                     >
+                                        Remove from Watchlist
+                                     </button>
+                            </div>
+                                
+                        ))}
+                    </div>
+                 )}
+            </div>
+
+
 
         </>
     );
