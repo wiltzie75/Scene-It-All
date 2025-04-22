@@ -19,9 +19,14 @@ import AdminMovies from './components/AdminMovies';
   function App() {
     const [count, setCount] = useState(0);
     const [token, setToken] = useState(null);
-    const userRole = localStorage.getItem('userRole');
-
-    console.log('Current User Role:', userRole);
+    let user = null;
+      try {
+        const storedUser = localStorage.getItem('user');
+        user = storedUser ? JSON.parse(storedUser) : null;
+      } catch (error) {
+        localStorage.removeItem("user");
+      }
+    const userRole = user?.isAdmin;
 
 
   return (
@@ -36,14 +41,14 @@ import AdminMovies from './components/AdminMovies';
 
         <Container sx={{ flex: 1, mt: 4 }}>
          
-           {/* Only show "Go to Admin Page" button if user is admin */}
-        {userRole === 'admin' && (
-          <div className="admin-button" style={{ marginBottom: '16px' }} >
+        {/* Only show "Go to Admin Page" button if user is admin */}
+        {userRole === true && (
+          <div className="admin-button" style={{ marginBottom: '16px' }}>
             <Link to="/admin">
               <button>Go to Admin Page</button>
             </Link>
           </div>
-              )}
+        )}
         
           <Routes>
             <Route path="/" element={<Home />} />
@@ -56,7 +61,7 @@ import AdminMovies from './components/AdminMovies';
             <Route path="/users" element={<Users />} />
             
             {/*  Only show the admin page if the user is an admin  */}
-            < Route path = "/admin" element={userRole === 'admin' ? <AdminMovies /> : <Navigate to="/" />} />
+            <Route path="/admin" element={user?.isAdmin ? <AdminMovies /> : <Navigate to="/" />} />
           
         
       

@@ -20,9 +20,13 @@ const Login = () => {
       });
       console.log(res);
       const data = await res.json();
+      console.log("Login response data:", data); 
 
       if (res.ok) {
         localStorage.setItem("token", data.token);
+        localStorage.setItem("user", JSON.stringify(data.user)); 
+        console.log("Stored user in localStorage:", localStorage.getItem("user"));
+        console.log("Login response:", data);
         navigate("/profile");
       } else {
         setError(data.message || "Login failed");
