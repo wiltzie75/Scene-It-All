@@ -37,19 +37,23 @@ const AdminMovies = () => {
   const handleAddMovie = async (e) => {
     e.preventDefault();
     try {
+      const currentUser = JSON.parse(localStorage.getItem('user'));
       const response = await fetch(`${API}/movies`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(newMovie),
+        body: JSON.stringify({
+          ...newMovie,
+          userId: currentUser?.id, // Add userId if available
+        }),
       });
       if (response.ok) {
         const addedMovie = await response.json();
         setMovies((prevMovies) => [...prevMovies, addedMovie]);
         setNewMovie({
           title: '',
-          description: '',
+          plot: '',
           poster: '',
           year: '',
           genre: '',
@@ -96,8 +100,8 @@ const AdminMovies = () => {
         <div>
           <label>Description</label>
           <textarea
-            name="description"
-            value={newMovie.description}
+            name="plot"
+            value={newMovie.plot}
             onChange={handleInputChange}
             required
           />
@@ -112,7 +116,7 @@ const AdminMovies = () => {
             required
           />
         </div>
-        <div>
+        {/* <div>
           <label>Rating</label>
           <input
             type="number"
@@ -131,7 +135,7 @@ const AdminMovies = () => {
             onChange={handleInputChange}
             required
           />
-        </div>
+        </div> */}
         <div>
           <label>Year</label>
           <input
