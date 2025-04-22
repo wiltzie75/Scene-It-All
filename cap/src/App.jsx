@@ -1,24 +1,21 @@
-
 import { useState } from "react";
 import "./App.css";
 import { Routes, Route, Navigate } from "react-router-dom";
 import { Box, Container } from "@mui/material";
 import Navbar from "./components/Navbar";
-import Register from "./components/Register"
+import Register from "./components/Register";
 import Login from "./components/Login";
 import Profile from "./components/Profile";
-// import TopRated from "/TopRated";
+import TopRated from "./components/TopRated";
 import Home from "./components/Home";
 import Movies from "./components/Movies";
 import MyReviews from "./components/MyReviews";
 import MyComments from "./components/MyComments";
 import Users from "./components/Users";
 
-
-  function App() {
-    const [count, setCount] = useState(0);
-    const [token, setToken] = useState(null);
-
+function App() {
+  const [count, setCount] = useState(0);
+  const [token, setToken] = useState(null);
 
   return (
     <Box
@@ -30,28 +27,34 @@ import Users from "./components/Users";
     >
       <Navbar />
 
-        <Container sx={{ flex: 1, mt: 4 }}>
-          <Routes>
-            <Route path="/" element={<Home />} />
-            <Route path="/Movies" element={<Movies />} />
-            <Route path="/register" element={<Register token={token} setToken={setToken}/>} />
-            <Route path="/login" element={<Login token={token} setToken={setToken} />} />
-            <Route path="/profile" element={<Profile />} />
-            <Route path="/myreviews" element={<MyReviews />} />
-            <Route path="/mycomments" element={<MyComments />} />
-            <Route path="/users" element={<Users />} />
-            {/* <Route path="/top rated" element={<TopRated />} /> */}
-            {/* <Route
+      <Container sx={{ flex: 1, mt: 4 }}>
+        <Routes>
+          <Route path="/" element={<Home />} />
+          <Route path="/Movies" element={<Movies />} />
+          <Route
+            path="/register"
+            element={<Register token={token} setToken={setToken} />}
+          />
+          <Route
+            path="/login"
+            element={<Login token={token} setToken={setToken} />}
+          />
+          <Route path="/profile" element={<Profile />} />
+          <Route path="/myreviews" element={<MyReviews />} />
+          <Route path="/mycomments" element={<MyComments />} />
+          <Route path="/users" element={<Users />} />
+          <Route path="/top-rated" element={<TopRated />} />
+
+          {/* <Route
             path="/admin"
             element={isLoggedIn ? <AdminPanel /> : <Navigate to="/" />}
              /> */}
-          </Routes>
-        </Container>
-       
+        </Routes>
+      </Container>
 
-        {/* <Footer /> */}
-      </Box>
-    );
-  }
+      {/* <Footer /> */}
+    </Box>
+  );
+}
 
-  export default App;
+export default App;
