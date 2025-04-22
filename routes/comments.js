@@ -3,7 +3,6 @@ const router = express.Router();
 const { PrismaClient } = require('@prisma/client');
 const prisma = new PrismaClient();
 
-
 // create comments
 router.post('/',async(req,res)=>{
     try{

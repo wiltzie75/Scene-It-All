@@ -160,7 +160,7 @@ const Reviews = () => {
         setEditedComment({ subject: "", description: "" });
     };
 
-    async function removeComment(commentId) {
+    async function removeComment(reviewId, commentId) {
         try {
             const token = localStorage.getItem("token");
             const response = await fetch(`${API}/reviews/${reviewId}/comments/${commentId}`, {
