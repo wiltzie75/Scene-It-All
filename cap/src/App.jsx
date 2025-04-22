@@ -14,6 +14,7 @@ import MyReviews from "./components/MyReviews";
 import MyComments from "./components/MyComments";
 import Users from "./components/Users";
 import AdminMovies from './components/AdminMovies';
+import Reviews from "./components/Reviews";
 
 
   function App() {
@@ -53,6 +54,7 @@ import AdminMovies from './components/AdminMovies';
           <Routes>
             <Route path="/" element={<Home />} />
             <Route path="/Movies" element={<Movies />} />
+            <Route path="/reviews" element={<Reviews />} />
             <Route path="/register" element={<Register token={token} setToken={setToken}/>} />
             <Route path="/login" element={<Login token={token} setToken={setToken} />} />
             <Route path="/profile" element={<Profile />} />
