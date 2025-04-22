@@ -44,16 +44,17 @@ const Reviews = () => {
         }
     }, [profile.isAdmin]);
 
-    const getProfile = async () => {
-        const token = localStorage.getItem("token");
-        if (!token) {
-            navigate("/login");
-            return;
-        }
-    
-        const APIResponse = await fetchProfile(token);
-        if (APIResponse) {
-            setProfile(APIResponse);
+    const fetchProfile = async (token) => {
+        try {
+            const response = await fetch(`${API}/profile`, {
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": `Bearer ${token}`},
+                });
+                const result = await response.json();
+                return result;
+        } catch (error) {
+            console.error(error);
         }
     };
 
@@ -77,12 +78,11 @@ const Reviews = () => {
                 }),
             });
 
-            if (res.ok) {
-                await getProfile(); 
-                const updatedReviews = profile.reviews.map((r) => 
+            if (res.ok) { 
+                const updatedReviews = reviews.map((r) => 
                     r.id === reviewId ? { ...r, ...editedReview } : r
                 );
-                setProfile({ ...profile, reviews: updatedReviews });
+                setReviews(updatedReviews);
                 setEditingReviewId(null);
                 setEditedReview({ subject: "", description: "" });
             }
@@ -106,7 +106,7 @@ const Reviews = () => {
                 }
             });
             if (response.ok) {
-                await getProfile();
+                setReviews(reviews.filter(r => r.id !== reviewId));
             }
         } catch (error) {
             console.error(error);
@@ -120,6 +120,7 @@ const Reviews = () => {
                 {users?.isAdmin ? (
                     reviews.map((review) => (
                         <div key={review.id}>
+                            <h4>{review.movie?.title || "Untitled Movie"}</h4>
                             {editingReviewId === review.id ? (
                                 <div>
                                     <input
@@ -154,7 +155,7 @@ const Reviews = () => {
                     ) : (
                         reviews.map((review) => (
                         <div>
-                            <p>{movie.title}</p>
+                            <h4>{review.movie?.title || "Untitled Movie"}</h4>
                             <p>{review.subject}</p>
                             <p>{review.description}</p>
                             {review.comments && review.comments.map((comment) => (
