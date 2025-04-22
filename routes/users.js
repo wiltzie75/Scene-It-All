@@ -55,7 +55,16 @@ router.post('/login', async (req, res, next) => {
         if(!passwordCheck) return res.json({error: "incorrect password :("})
 
           const token = jwt.sign({ id: user.id }, process.env.JWT);
-          res.json({token});
+          res.json({
+            token,
+            user: {
+              id: user.id,
+              email: user.email,
+              isAdmin: user.isAdmin,
+              firstName: user.firstName,
+              lastName: user.lastName,
+            },
+          });
     } catch (error) {
       next(error);
     }

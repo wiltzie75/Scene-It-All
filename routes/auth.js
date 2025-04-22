@@ -52,6 +52,13 @@ router.post('/login',async(req,res)=>{
         res.json({
             message: `Welcome back, ${user.firstName}! `,
             token,
+            user: {
+                id: user.id,
+                email: user.email,
+                isAdmin: user.isAdmin,
+                firstName: user.firstName,
+                lastName: user.lastName,
+            }
         });
     } catch(error){
         console.error('Login error',error);
