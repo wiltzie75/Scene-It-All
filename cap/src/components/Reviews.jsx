@@ -113,6 +113,23 @@ const Reviews = () => {
         }    
     }
 
+    const renderComments = (review) => {
+        return (
+            <>
+                {Array.isArray(review.comments) && review.comments.length > 0 ? (
+                    review.comments.map((comment) => (
+                        <div key={comment.id} style={{ marginLeft: "1rem", borderLeft: "2px solid #ccc", paddingLeft: "1rem" }}>
+                            <p><strong>{comment.subject}</strong></p>
+                            <p>{comment.description}</p>
+                        </div>
+                    ))
+                ) : (
+                    <p style={{ fontStyle: "italic" }}>No comments available</p>
+                )}
+            </>
+        );
+    };
+
     return ( 
         <>
             {/* Displays all reviews */}
@@ -146,24 +163,28 @@ const Reviews = () => {
                             ) : (
                                 <div>
                                     <p>{review.subject}: {review.description}</p>
+                                    <div>
+                                        <h5>Comments</h5>
+                                        {renderComments(review)}
+                                    </div>
                                     <button onClick={() => handleReviewEdit(review)}>Edit</button>
                                     <button onClick={() => removeReview(review.id)}>Delete</button>
+
+                                    {/* <div>
+                                        <h5>Comments</h5>
+                                        {renderComments(review)}
+                                    </div> */}
                                 </div>
                             )}
                         </div>
                         ))
                     ) : (
                         reviews.map((review) => (
-                        <div>
+                        <div key={review.id}>
                             <h4>{review.movie?.title || "Untitled Movie"}</h4>
                             <p>{review.subject}</p>
                             <p>{review.description}</p>
-                            {review.comments && review.comments.map((comment) => (
-                                <div key={comment.id}>
-                                    <p>{comment.subject}</p>
-                                    <p>{comment.description}</p>
-                                </div>
-                            ))}
+                            {renderComments(review)}
                         </div>
                     ))
                 )}

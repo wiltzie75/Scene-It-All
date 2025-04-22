@@ -6,7 +6,10 @@ const prisma = new PrismaClient();
 router.get('/',async(req,res)=>{
     try{
         const reviews = await prisma.review.findMany({
-            include: {movie: true},
+            include: {
+              movie: true,
+              comments: true, 
+            },
         });
         res.json(reviews)
     }catch(error) {
