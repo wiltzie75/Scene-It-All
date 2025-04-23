@@ -14,74 +14,86 @@ datasource db {
 }
 
 model Movie {
-  id Int @id @default(autoincrement())
-  imdbId String?
-  title String
-  plot String? @db.Text
-  poster String?
-  year String?
-  genre String?
-  imdbRating Float?
-  imdbVotes String?
+  id          Int          @id @default(autoincrement())
+  imdbId      String?
+  title       String
+  plot        String?      @db.Text
+  poster      String?
+  year        String?
+  genre       String?
+  imdbRating  Float?
+  imdbVotes   String?
   userRatings UserRating[]
-  reviews Review[]
-  userId Int
-  user User? @relation(fields: [userId], references: [id], onDelete: Cascade)
-  favorites Favorite[]
+  reviews     Review[]
+  userId      Int
+  user        User?        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  favorites   Favorite[]
+  watchlist   Watchlist[]
+}
+
+model Watchlist {
+  id      Int   @id @default(autoincrement())
+  userId  Int
+  user    User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  movieId Int
+  movie   Movie @relation(fields: [movieId], references: [id])
 }
 
 model Review {
-  id Int @id @default(autoincrement())
-  subject String
+  id          Int       @id @default(autoincrement())
+  subject     String
   description String
-  rating Float?
-  userId Int
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
-  movieId Int
-  movie Movie @relation(fields: [movieId], references: [id])
-  comments Comment[]
+  rating      Float?
+  userId      Int
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  movieId     Int
+  movie       Movie     @relation(fields: [movieId], references: [id])
+  comments    Comment[]
 }
 
 model Comment {
-  id Int @id @default(autoincrement())
-  subject String?
+  id          Int     @id @default(autoincrement())
+  subject     String?
   description String
-  userId Int
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
-  reviewId Int
-  review Review @relation(fields: [reviewId], references: [id], onDelete: Cascade)
+  userId      Int
+  user        User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  reviewId    Int
+  review      Review  @relation(fields: [reviewId], references: [id], onDelete: Cascade)
 }
 
 model User {
-  id Int @id @default(autoincrement())
-  firstName String
-  lastName String
-  email String @unique
-  password String
-  movies Movie[]
-  reviews Review[]
-  comments Comment[]
-  ratings UserRating[]
-  favorites Favorite[]
-  isAdmin Boolean @default(false)
+  id         Int          @id @default(autoincrement())
+  firstName  String
+  lastName   String
+  email      String       @unique
+  password   String
+  movies     Movie[]
+  reviews    Review[]
+  comments   Comment[]
+  ratings    UserRating[]
+  favorites  Favorite[]
+  isAdmin    Boolean      @default(false)
+  watchlists Watchlist[]
 }
 
 model UserRating {
-  id        String   @id @default(uuid())
-  score     Float
-  review    String?  @db.Text
-  movie     Movie    @relation(fields: [movieId], references: [id], onDelete: Cascade)
-  movieId   Int
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  userId    Int
+  id      String  @id @default(uuid())
+  score   Float
+  review  String? @db.Text
+  movie   Movie   @relation(fields: [movieId], references: [id], onDelete: Cascade)
+  movieId Int
+  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId  Int
+
   @@unique([userId, movieId])
 }
 
 model Favorite {
-  id        String   @id @default(uuid())
-  movie     Movie    @relation(fields: [movieId], references: [id], onDelete: Cascade)
-  movieId   Int
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  userId    Int
+  id      String @id @default(uuid())
+  movie   Movie  @relation(fields: [movieId], references: [id], onDelete: Cascade)
+  movieId Int
+  user    User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId  Int
+
   @@unique([userId, movieId])
 }

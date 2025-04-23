@@ -2,11 +2,13 @@ import { useState, useEffect } from "react";
 import { TextField, Box, Typography, Card, CardMedia, CardContent, Dialog, DialogContent, DialogTitle, Button } from "@mui/material";
 import "../App.css";
 import API from "../api/api";
+import { hasCustomParams } from "react-admin";
 
 const Movies = () => {
   const [movies, setMovies] = useState([]);
   const [selectedMovie, setSelectedMovie] = useState(null);
   const [searchTerm, setSearchTerm] = useState("");
+  const [addedToWatchlist,setAddedToWatchlist] = useState({});
 
   useEffect(() => {
     const fetchMovies = async () => {
@@ -21,9 +23,43 @@ const Movies = () => {
     fetchMovies();
   }, []);
 
+  // add to watchlist
+  const handleAddToWatchlist = async(movieId) =>{
+    const token = localStorage.getItem("token");
+    if(!token){
+      alert("You must be logged in to add to Watchlist.");
+      return;
+    }
+    try{
+      const response = await fetch(`${API}/watchlist`,{
+        method:"POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${token}`,
+        },
+        body: JSON.stringify({movieId}),
+        
+      });
+      if (response.ok) {
+        alert("Movie added to Watchlist!");
+        setAddedToWatchlist((prevState) =>({
+          ...prevState,
+          [movieId]:true,
+        }));
+      } else {
+        const error = await response.json();
+        alert(error.message || "Failed to add to Watchlist");
+      }
+
+      }catch (error){
+        console.error("Error adding to Watchlist:",error);
+   }
+    };
+
   const filteredMovies = movies.filter((movie) =>
     movie?.title?.toLowerCase().includes(searchTerm.toLowerCase())
   );
+
 
   return (
     <Box sx={{ maxWidth: 900, margin: "auto", p: 3 }}>
@@ -80,6 +116,7 @@ const Movies = () => {
               <Typography variant="body1"><strong>Reviews:</strong> {selectedMovie.reviews}</Typography>
               <Typography variant="body1"><strong>Year:</strong> {selectedMovie.year}</Typography>
               <Typography variant="body1"><strong>Genre:</strong> {selectedMovie.genre}</Typography>
+              <Button onClick={() => handleAddToWatchlist(selectedMovie.id)} sx={{ mt: 2,mr: 2 }} color="primary" variant="contained" disabled={addedToWatchlist}>{addedToWatchlist ? "Added to Watchlist ✓" : "Add to Watchlist"}</Button>
               <Button onClick={() => setSelectedMovie(null)} sx={{ mt: 2 }} color="error" variant="contained">Close</Button>
             </DialogContent>
           </>
