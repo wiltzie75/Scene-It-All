@@ -59,6 +59,21 @@ const Movies = () => {
       console.error("Error adding Review", error);
     }
   };
+
+  const renderComments = (review) => {
+    return (
+        <>
+            {Array.isArray(review.comments) && review.comments.length > 0 ? (
+                review.comments.map((comment) => (
+                    <div key={comment.id} style={{ marginLeft: "1rem", borderLeft: "2px solid #ccc", paddingLeft: "1rem", marginBottom: "1rem" }}>
+                    </div>
+                ))
+            ) : (
+                <p style={{ fontStyle: "italic" }}>No comments available</p>
+            )}
+        </>
+    );
+};
   // add to watchlist
   const handleAddToWatchlist = async(movieId) =>{
     const token = localStorage.getItem("token");
@@ -155,6 +170,12 @@ const Movies = () => {
                   <Box key={review.id} sx={{ mt: 2 }}>
                     <Typography variant="subtitle1">{review.subject}</Typography>
                     <Typography variant="body2">{review.description}</Typography>
+                    <Box sx={{ mt: 4 }}>
+                      <Typography variant="h6" gutterBottom>
+                        Comments
+                      </Typography>
+                      {renderComments(review)}
+                    </Box>
                   </Box>
                 ))
               ) : (
