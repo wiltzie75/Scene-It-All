@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { TextField, Box, Typography, Card, CardMedia, CardContent, Dialog, DialogContent, DialogTitle, Button } from "@mui/material";
 import "../App.css";
 import API from "../api/api";
-import { hasCustomParams } from "react-admin";
+// import { hasCustomParams } from "react-admin";
 
 const Movies = () => {
   const [movies, setMovies] = useState([]);

@@ -36,11 +36,11 @@ router.get('/', verifyToken, async (req, res) => {
             include: {
               movie: true,
             },
-          },
-          watchlist: {
-            include :{
-              movie: true,
-            }
+          // },
+          // watchlist: {
+          //   include :{
+          //     movie: true,
+          //   }
           }
         },
       });
