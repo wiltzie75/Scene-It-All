@@ -49,7 +49,7 @@ function App() {
         
           <Routes>
             <Route path="/" element={<Home />} />
-            <Route path="/Movies" element={<Movies />} />
+            <Route path="/movies" element={<Movies />} />
             <Route path="/reviews" element={<Reviews />} />
             <Route path="/register" element={<Register token={token} setToken={setToken}/>} />
             <Route path="/top-rated" element={<TopRated />} />

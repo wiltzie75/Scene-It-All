@@ -10,15 +10,22 @@ import { Link, useNavigate } from "react-router-dom";
 
 export default function Navbar() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [isAdmin, setIsAdmin] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
-    const adminStatus = localStorage.getItem("adminLoggedIn");
-    setIsLoggedIn(adminStatus === "true");
+    const token = localStorage.getItem("token");
+    setIsLoggedIn(!!token);
+
+    if (token) {
+      const user = JSON.parse(localStorage.getItem("user") || "{}");
+      setIsAdmin(user.isAdmin === true);
+    }
   }, []);
 
   const handleLogout = () => {
-    localStorage.removeItem("adminLoggedIn");
+    localStorage.removeItem("token");
+    localStorage.removeItem("user");
     setIsLoggedIn(false);
     navigate("/");
   };
@@ -35,7 +42,7 @@ export default function Navbar() {
           <Button color="inherit" component={Link} to="/">
             Home
           </Button>
-          <Button color="inherit" component={Link} to="/Movies">
+          <Button color="inherit" component={Link} to="/movies">
             Movies
           </Button>
           <Button color="inherit" component={Link} to="/">
@@ -44,9 +51,30 @@ export default function Navbar() {
 
           <Box sx={{ ml: 2 }}>
             {isLoggedIn ? (
-              <Button color="inherit" onClick={handleLogout}>
+              <>
+                <Button color="inherit" component={Link} to="/watchlist">
+                Watchlist
+                </Button>
+                <Button color="inherit" component={Link} to="/myreviews">
+                My Reviews
+                </Button>
+                <Button color="inherit" component={Link} to="/mycomments">
+                My Comments
+                </Button>
+                {isAdmin && (
+                  <>
+                      <Button color="inherit" component={Link} to="/users">
+                      Manage Users
+                      </Button>
+                      <Button color="inherit" component={Link} to="/admin">
+                      Manage Movies
+                      </Button>
+                  </>
+                )}
+                <Button color="inherit" onClick={handleLogout}>
                 Logout
-              </Button>
+                </Button>
+              </>
             ) : (
               <>
                 <Button color="inherit" component={Link} to="/login">
