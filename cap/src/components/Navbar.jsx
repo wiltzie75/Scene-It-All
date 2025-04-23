@@ -8,25 +8,20 @@ import {
 } from "@mui/material";
 import { Link, useNavigate } from "react-router-dom";
 
-export default function Navbar() {
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
+export default function Navbar({token, setToken}) {
   const [isAdmin, setIsAdmin] = useState(false);
   const navigate = useNavigate();
-
   useEffect(() => {
-    const token = localStorage.getItem("token");
-    setIsLoggedIn(!!token);
-
     if (token) {
       const user = JSON.parse(localStorage.getItem("user") || "{}");
-      setIsAdmin(user.isAdmin === true);
+      setIsAdmin(user.isAdmin);
     }
-  }, []);
+  }, [token]);
 
   const handleLogout = () => {
     localStorage.removeItem("token");
     localStorage.removeItem("user");
-    setIsLoggedIn(false);
+    setToken(null);
     navigate("/");
   };
 
@@ -50,7 +45,7 @@ export default function Navbar() {
           </Button>
 
           <Box sx={{ ml: 2 }}>
-            {isLoggedIn ? (
+            {token ? (
               <>
                 <Button color="inherit" component={Link} to="/watchlist">
                 Watchlist
@@ -61,7 +56,7 @@ export default function Navbar() {
                 <Button color="inherit" component={Link} to="/mycomments">
                 My Comments
                 </Button>
-                {isAdmin && (
+                {isAdmin ? (
                   <>
                       <Button color="inherit" component={Link} to="/users">
                       Manage Users
@@ -70,7 +65,7 @@ export default function Navbar() {
                       Manage Movies
                       </Button>
                   </>
-                )}
+                ) : null}
                 <Button color="inherit" onClick={handleLogout}>
                 Logout
                 </Button>

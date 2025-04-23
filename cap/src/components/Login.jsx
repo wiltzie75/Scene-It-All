@@ -9,12 +9,11 @@ import {
   Alert,
 } from "@mui/material";
 
-const Login = () => {
+const Login = ({token, setToken}) => {
   const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
-
   // Simple email validation function
   const validateEmail = (email) => {
     const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -40,16 +39,13 @@ const Login = () => {
         },
         body: JSON.stringify({ email, password }),
       });
-      console.log(res);
       const data = await res.json();
-      console.log("Login response data:", data); 
 
       if (res.ok) {
         localStorage.setItem("token", data.token);
-        localStorage.setItem("user", JSON.stringify(data.user)); 
-        console.log("Stored user in localStorage:", localStorage.getItem("user"));
-        console.log("Login response:", data);
-        navigate("/profile");
+        localStorage.setItem("user", JSON.stringify(data.user));
+        setToken(data.token);
+        navigate("/");
       } else {
         setError(data.message || "Login failed");
       }
