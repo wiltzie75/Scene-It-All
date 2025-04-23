@@ -49,6 +49,7 @@ model Review {
   movieId     Int
   movie       Movie     @relation(fields: [movieId], references: [id])
   comments    Comment[]
+   @@unique([userId, movieId])
 }
 
 model Comment {
@@ -84,7 +85,6 @@ model UserRating {
   movieId Int
   user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId  Int
-
   @@unique([userId, movieId])
 }
 
@@ -94,6 +94,5 @@ model Favorite {
   movieId Int
   user    User   @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId  Int
-
   @@unique([userId, movieId])
 }
