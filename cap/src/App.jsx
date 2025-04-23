@@ -18,6 +18,7 @@ import Reviews from "./components/Reviews";
 function App() {
   const [count, setCount] = useState(0);
   const [token, setToken] = useState(null);
+  
   let user = null;
   try {
     const storedUser = localStorage.getItem("user");
@@ -35,7 +36,7 @@ function App() {
         minHeight: "100vh",
       }}
     >
-      <Navbar />
+      <Navbar token={token} setToken={setToken}/>
 
       <Container sx={{ flex: 1, mt: 4 }}>
         {/* Only show "Go to Admin Page" button if user is admin */}

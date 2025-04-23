@@ -13,20 +13,42 @@ router.get ('/',async(req,res) => {
 }
 );
 // get single movie
-router.get('/:id',async(req, res) => {
-    const {id} = req.params;
-    try{
-        const movie= await prisma.movie.findUnique({
-            where:{id: Number(id)},
-        })
-        if(!movie){
-            return res.status(404).json({message: 'Movie not found'});
-        } res.json(movie);
-    } catch (error){
-        console.error(error);
-        res.status(500).send ('Server error');
+router.get('/:id', async (req, res) => {
+    const { id } = req.params;
+    try {
+      const movie = await prisma.movie.findUnique({
+        where: {
+          id: parseInt(id)
+        },
+        include: {
+          reviews: {
+            include: {
+              comments: true, // optional, include if you need comments
+              user: {
+                select: {
+                  firstName: true,
+                  lastName: true,
+                  email: true
+                }
+              }
+            }
+          },
+          userRatings: true,
+          favorites: true,
+          watchlist: true
+        }
+      });
+  
+      if (!movie) {
+        return res.status(404).json({ message: 'Movie not found' });
+      }
+  
+      res.json(movie);
+    } catch (error) {
+      console.error(error);
+      res.status(500).send('Server error');
     }
-});
+  });
 // create a new movie
 router.post('/',async(req, res)=> {
     const { title, plot, poster, year, genre, userRatings, reviews, userId } = req.body;

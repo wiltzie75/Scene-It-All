@@ -9,6 +9,8 @@ const Movies = () => {
   const [selectedMovie, setSelectedMovie] = useState(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [addedToWatchlist,setAddedToWatchlist] = useState({});
+  const [addReview, setAddReview] = useState({ subject: "", description: ""});
+  const [addComment, setAddComment] = useState({ subject: "", description: ""});
 
   useEffect(() => {
     const fetchMovies = async () => {
@@ -23,6 +25,55 @@ const Movies = () => {
     fetchMovies();
   }, []);
 
+  const handleReviewSubmit = async(reviewId) => {
+    const token = localStorage.getItem("token");
+    if(!token){
+      alert("You must be logged in to add a Review.");
+      return;
+    }
+    try {
+      const response = await fetch(`${API}/reviews`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          movieId,
+          subject: addReview.subject,
+          description: addReview.description,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        alert("Review added");
+        setAddReview({ subject: "", description: "" });
+      } else {
+        const error = await response.json();
+        alert(error.message || "Failed to add Review");
+      }
+
+    } catch (error) {
+      console.error("Error adding Review", error);
+    }
+  };
+
+  const renderComments = (review) => {
+    return (
+        <>
+            {Array.isArray(review.comments) && review.comments.length > 0 ? (
+                review.comments.map((comment) => (
+                    <div key={comment.id} style={{ marginLeft: "1rem", borderLeft: "2px solid #ccc", paddingLeft: "1rem", marginBottom: "1rem" }}>
+                    </div>
+                ))
+            ) : (
+                <p style={{ fontStyle: "italic" }}>No comments available</p>
+            )}
+        </>
+    );
+};
   // add to watchlist
   const handleAddToWatchlist = async(movieId) =>{
     const token = localStorage.getItem("token");
@@ -111,12 +162,29 @@ const Movies = () => {
             image={selectedMovie.poster}
             alt={selectedMovie.title}
             sx={{ objectFit: "contain", width: "100%" }}/>
-              <Typography variant="body1" sx={{ mt: 2 }}><strong>Description:</strong> {selectedMovie.description}</Typography>
-              <Typography variant="body1"><strong>Rating:</strong> {selectedMovie.rating}</Typography>
-              <Typography variant="body1"><strong>Reviews:</strong> {selectedMovie.reviews}</Typography>
+              <Typography variant="body1" sx={{ mt: 2 }}><strong>Description:</strong> {selectedMovie.plot}</Typography>
+              <Typography variant="body1"><strong>Rating:</strong> {selectedMovie.imdbRating}</Typography>
+              <Typography variant="body1"><strong>My Rating:</strong> {selectedMovie.userRatings}</Typography>
+              {selectedMovie.reviews && selectedMovie.reviews.length > 0 ? (
+                selectedMovie.reviews.map((review) => (
+                  <Box key={review.id} sx={{ mt: 2 }}>
+                    <Typography variant="subtitle1">{review.subject}</Typography>
+                    <Typography variant="body2">{review.description}</Typography>
+                    <Box sx={{ mt: 4 }}>
+                      <Typography variant="h6" gutterBottom>
+                        Comments
+                      </Typography>
+                      {renderComments(review)}
+                    </Box>
+                  </Box>
+                ))
+              ) : (
+                <Typography>No reviews yet.</Typography>
+              )}
               <Typography variant="body1"><strong>Year:</strong> {selectedMovie.year}</Typography>
               <Typography variant="body1"><strong>Genre:</strong> {selectedMovie.genre}</Typography>
               <Button onClick={() => handleAddToWatchlist(selectedMovie.id)} sx={{ mt: 2,mr: 2 }} color="primary" variant="contained" disabled={addedToWatchlist}>{addedToWatchlist ? "Added to Watchlist ✓" : "Add to Watchlist"}</Button>
+              <Button onClick={() => handleReviewSubmit(selectedMovie.id)}>Add Review</Button>
               <Button onClick={() => setSelectedMovie(null)} sx={{ mt: 2 }} color="error" variant="contained">Close</Button>
             </DialogContent>
           </>
