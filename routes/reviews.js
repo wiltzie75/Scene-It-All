@@ -1,7 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const { PrismaClient } = require('@prisma/client');
-const prisma = new PrismaClient();
+const prisma = require('../prisma');
 // get all reviews
 router.get('/',async(req,res)=>{
     try{
@@ -47,29 +46,6 @@ router.get('/movie/:movieId', async (req, res) => {
       res.status(500).json({ message: 'Server error', error: error.message });
     }
   });
-
-  // create comment
-  
-  router.post('/:reviewId/comments', async (req, res) => {
-    const { reviewId } = req.params;
-    const { subject, description, userId } = req.body;
-  
-    try {
-      const comment = await prisma.comment.create({
-        data: {
-          subject,
-          description,
-          user: { connect: { id: Number(userId) } },
-          review: { connect: { id: Number(reviewId) } },
-        },
-      });
-      res.status(201).json(comment);
-    } catch (error) {
-      console.error('Error creating comment:', error);
-      res.status(500).json({ message: 'Server error', error: error.message });
-    }
-  });
-
 
   // edit review
   router.put('/:id',async(req,res)=>{
