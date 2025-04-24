@@ -14,8 +14,13 @@ const Movies = () => {
   const [addComment, setAddComment] = useState({ subject: "", description: ""});
   const [isCommentDialogOpen, setIsCommentDialogOpen] = useState(false);
   const [activeReviewId, setActiveReviewId] = useState(null);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
 
   useEffect(() => {
+
+    const token = localStorage.getItem("token");
+    setIsLoggedIn(!!token);
+
     const fetchMovies = async () => {
       try {
         const response = await fetch(`${API}/movies`);
@@ -237,8 +242,11 @@ const Movies = () => {
                     <Typography variant="body2">{review.description}</Typography>
                     <Box sx={{ mt: 4 }}>
                     {renderComments(review)}
-                    <Button onClick={() => {setActiveReviewId(review.id); setIsCommentDialogOpen(true)}}>Add a Comment</Button>
-                    <Button onClick={() => setSelectedMovie(null)} sx={{ mt: 2 }} color="error" variant="contained">Close</Button>
+                    {isLoggedIn && (
+                      <>
+                        <Button onClick={() => {setActiveReviewId(review.id); setIsCommentDialogOpen(true)}}>Add a Comment</Button>
+                      </>
+                    )}
                     <Dialog open={isCommentDialogOpen} onClose={() => setIsCommentDialogOpen(false)}>
 
                       <DialogTitle>Add a Comment</DialogTitle>
@@ -283,8 +291,12 @@ const Movies = () => {
               ) : (
                 <Typography>No reviews yet.</Typography>
               )}
-              <Button onClick={() => handleAddToWatchlist(selectedMovie.id)} sx={{ mt: 2,mr: 2 }} color="primary" variant="contained" disabled={addedToWatchlist}>{addedToWatchlist ? "Added to Watchlist ✓" : "Add to Watchlist"}</Button>
-              <Button onClick={() => setIsReviewDialogOpen(true)}>Add Review</Button>
+              {isLoggedIn && (
+                <>
+                  <Button onClick={() => handleAddToWatchlist(selectedMovie.id)} sx={{ mt: 2,mr: 2 }} color="primary" variant="contained" disabled={addedToWatchlist}>{addedToWatchlist ? "Added to Watchlist ✓" : "Add to Watchlist"}</Button>
+                  <Button onClick={() => setIsReviewDialogOpen(true)}>Add Review</Button>
+                </>
+              )}
               <Button onClick={() => setSelectedMovie(null)} sx={{ mt: 2 }} color="error" variant="contained">Close</Button>
               <Dialog open={isReviewDialogOpen} onClose={() => setIsReviewDialogOpen(false)}>
                 <DialogTitle>Add a Review</DialogTitle>
