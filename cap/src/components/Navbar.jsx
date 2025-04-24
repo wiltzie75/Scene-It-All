@@ -24,7 +24,7 @@ export default function Navbar({ token, setToken }) {
 
   return (
     <>
-      <AppBar position="fixed" sx={{ zIndex: 10 }}>
+      <AppBar position="static" sx={{ zIndex: 10 }}>
         <Toolbar>
           <Typography variant="h5" sx={{ flex: 1 }}>
             Scene It All
