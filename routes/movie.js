@@ -4,7 +4,35 @@ const prisma = require("../prisma");
 // get all movies
 router.get("/", async (req, res) => {
   try {
-    const movies = await prisma.movie.findMany();
+    const movies = await prisma.movie.findMany({
+      include: {
+        reviews: {
+          include: {
+            user: {
+              select: {
+                firstName: true,
+                lastName: true,
+                email: true,
+              },
+            },
+            comments: {
+              include: {
+                user: {
+                  select: {
+                    firstName: true,
+                    lastName: true,
+                    email: true,
+                  }
+                }
+              }
+            },
+          },
+        },
+        userRatings: true,
+        favorites: true,
+        watchlist: true,
+      }
+    });
     res.json(movies);
   } catch (error) {
     console.error(error);
@@ -22,13 +50,23 @@ router.get("/:id", async (req, res) => {
       include: {
         reviews: {
           include: {
-            comments: true, // optional, include if you need comments
             user: {
               select: {
                 firstName: true,
                 lastName: true,
                 email: true,
               },
+            },
+            comments: {
+              include: {
+                user: {
+                  select: {
+                    firstName: true,
+                    lastName: true,
+                    email: true,
+                  }
+                }
+              }
             },
           },
         },

@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
 import { Container, Box, TextField, Button, Typography, Alert } from '@mui/material';
+import { useNavigate } from "react-router-dom";
 import API from "../api/api";
 
 const RegisterUser = ({ setToken }) => {
+  const navigate = useNavigate();
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [email, setEmail] = useState("");
@@ -19,6 +21,7 @@ const RegisterUser = ({ setToken }) => {
       });
       const result = await response.json();
       console.log("Successfully registered", result);
+      navigate("/");
       return result.token;
     } catch (err) {
       console.error(`Error registering user ${email}:`, err);
