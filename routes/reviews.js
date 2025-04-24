@@ -35,6 +35,17 @@ router.get("/movie/:movieId", async (req, res) => {
 // create review
 router.post("/", async (req, res) => {
   const { subject, description, rating, movieId, userId } = req.body;
+
+  if (!userId || isNaN(userId)) {
+    return res.status(400).json({ message: "Invalid or missing userId" });
+  }
+  if (!movieId || isNaN(movieId)) {
+    return res.status(400).json({ message: "Invalid or missing movieId" });
+  }
+  if (rating === undefined || isNaN(parseFloat(rating))) {
+    return res.status(400).json({ message: "Invalid or missing rating" });
+  }
+  
   try {
     const review = await prisma.review.create({
       data: {

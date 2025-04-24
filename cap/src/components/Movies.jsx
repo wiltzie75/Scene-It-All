@@ -26,12 +26,19 @@ const Movies = () => {
     fetchMovies();
   }, []);
 
-  const handleReviewSubmit = async(reviewId) => {
+  const handleReviewSubmit = async(movieId) => {
     const token = localStorage.getItem("token");
     if(!token){
       alert("You must be logged in to add a Review.");
       return;
     }
+
+    const user = JSON.parse(localStorage.getItem("user")); // or however you store user info
+    if (!user?.id) {
+      alert("User info not found.");
+      return;
+    }
+
     try {
       const response = await fetch(`${API}/reviews`, {
         method: "POST",
@@ -43,6 +50,8 @@ const Movies = () => {
           movieId,
           subject: addReview.subject,
           description: addReview.description,
+          userId: user.id,
+          rating: 5,
         }),
       });
 
@@ -52,8 +61,7 @@ const Movies = () => {
         alert("Review added");
         setAddReview({ subject: "", description: "" });
       } else {
-        const error = await response.json();
-        alert(error.message || "Failed to add Review");
+        alert(data.message || "Failed to add Review");
       }
 
     } catch (error) {
@@ -66,15 +74,18 @@ const Movies = () => {
         <>
             {Array.isArray(review.comments) && review.comments.length > 0 ? (
                 review.comments.map((comment) => (
-                    <div key={comment.id} style={{ marginLeft: "1rem", borderLeft: "2px solid #ccc", paddingLeft: "1rem", marginBottom: "1rem" }}>
-                    </div>
+                  <div key={comment.id} style={{ marginLeft: "1rem", borderLeft: "2px solid #ccc", paddingLeft: "1rem", marginBottom: "1rem" }}>
+                    <Typography variant="subtitle2">{comment.subject}</Typography>
+                    <Typography variant="body2">{comment.description}</Typography>
+                </div>
                 ))
             ) : (
                 <p style={{ fontStyle: "italic" }}>No comments available</p>
             )}
         </>
     );
-};
+  };
+
   // add to watchlist
   const handleAddToWatchlist = async(movieId) =>{
     const token = localStorage.getItem("token");
@@ -111,7 +122,6 @@ const Movies = () => {
   const filteredMovies = movies.filter((movie) =>
     movie?.title?.toLowerCase().includes(searchTerm.toLowerCase())
   );
-
 
   return (
     <Box sx={{ maxWidth: 900, margin: "auto", p: 3 }}>
@@ -174,7 +184,7 @@ const Movies = () => {
                     <Typography variant="body2">{review.description}</Typography>
                     <Box sx={{ mt: 4 }}>
                     <Typography variant="h6" gutterBottom>
-                      Comments
+                      {/* Comments */}
                     </Typography>
                     {renderComments(review)}
                   </Box>
@@ -187,38 +197,52 @@ const Movies = () => {
               <Typography variant="body1"><strong>Genre:</strong> {selectedMovie.genre}</Typography>
               <Button onClick={() => handleAddToWatchlist(selectedMovie.id)} sx={{ mt: 2,mr: 2 }} color="primary" variant="contained" disabled={addedToWatchlist}>{addedToWatchlist ? "Added to Watchlist ✓" : "Add to Watchlist"}</Button>
               <Button onClick={() => setIsReviewDialogOpen(true)}>Add Review</Button>
-                <Dialog open={isReviewDialogOpen} onClose={() => setIsReviewDialogOpen(false) fullWidth maxWidth="sm">
-                <DialogTitle>Add Your Review</DialogTitle>
-                <DialogContent>
-                <Box>
-                  <TextField
-                      type="text"
-                      placeholder="Subject"
-                      value={editedReview.subject}
-                      onChange={(e) =>
-                          setEditedReview({ ...editedReview, subject: e.target.value })
-                      }
-                  />
-                  <TextField
-                      placeholder="Description"
-                      value={editedReview.description}
-                      onChange={(e) =>
-                          setEditedReview({ ...editedReview, description: e.target.value })
-                      }
-                  />
-                </Box>
-                </DialogContent>
-                <Box>
-                  <Button onClick={() => setIsReviewDialogOpen(false)}>Cancel</Button>
-                  <Button onClick={handleReviewCancel}>Cancel</button>
-                </Box>
               <Button onClick={() => setSelectedMovie(null)} sx={{ mt: 2 }} color="error" variant="contained">Close</Button>
+              <Dialog open={isReviewDialogOpen} onClose={() => setIsReviewDialogOpen(false)}>
+                <DialogTitle>Add a Review</DialogTitle>
+                <DialogContent>
+                  <TextField
+                    label="Subject"
+                    fullWidth
+                    value={addReview.subject}
+                    onChange={(e) =>
+                      setAddReview({ ...addReview, subject: e.target.value })
+                    }
+                    sx={{ mb: 2 }}
+                  />
+                  <TextField
+                    label="Description"
+                    fullWidth
+                    multiline
+                    rows={4}
+                    value={addReview.description}
+                    onChange={(e) =>
+                      setAddReview({ ...addReview, description: e.target.value })
+                    }
+                  />
+                  <Box sx={{ mt: 2, display: "flex", justifyContent: "flex-end", gap: 1 }}>
+                    <Button onClick={() => setIsReviewDialogOpen(false)} color="error">
+                      Cancel
+                    </Button>
+                    <Button
+                      variant="contained"
+                      onClick={() => {
+                        handleReviewSubmit(selectedMovie.id);
+                        setIsReviewDialogOpen(false);
+                      }}
+                    >
+                      Save
+                    </Button>
+                  </Box>
+                </DialogContent>
+              </Dialog>
             </DialogContent>
           </>
         )}
-      </Dialog>
-    </Box>
-  );
-};
+          </Dialog>
+      </Box>
+      )
+
+   };
 
 export default Movies;
