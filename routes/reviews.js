@@ -1,7 +1,7 @@
 const express = require("express");
 const router = express.Router();
-const prisma = require('../prisma');
-
+const { PrismaClient } = require("@prisma/client");
+const prisma = new PrismaClient();
 // get all reviews
 router.get('/',async(req,res)=>{
     try{
@@ -135,24 +135,6 @@ router.put('/:reviewId/comments/:commentId', async (req, res) => {
       return res.status(404).json({ message: 'Comment not found' });
     }
 
-  // edit review
-  router.put('/:id',async(req,res)=>{
-    const { id } = req.params;
-    const { subject, description, comments, rating } = req.body;
-    try{
-        const updated = await prisma.review.update({
-            where: {id: Number(id)},
-            data:{
-                subject,
-                description,
-                comments: comments || undefined,
-                rating : parseFloat(rating),
-            },
-        });
-        res.json(updated);
-    }catch(error){
-        console.error(error);
-        res.status(500).send('Server error');
     if (comment.review.id !== Number(reviewId)) {
       return res.status(400).json({ message: 'Comment does not belong to this review' });
     }
@@ -205,4 +187,3 @@ router.delete('/:reviewId/comments/:commentId', async (req, res) => {
 });
 
 module.exports = router;
-

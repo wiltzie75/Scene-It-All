@@ -185,7 +185,7 @@ const Movies = () => {
   const totalPages = Math.ceil(filteredMovies.length / itemsPerPage);
 
   return (
-    <Box sx={{ maxWidth: 1200, margin: "0 auto", gap: 2, mt: 6,p: 2, display: "flex", flexDirection: "column" }}>
+    <Box sx={{ maxWidth: 1200, margin: "0 auto", gap: 2, mt: 2, p: 2, display: "flex", flexDirection: "column" }}>
       {/* Search Bar */}
       <Box sx={{ mb: 1, display: "flex", justifyContent: "center" }}>
         <TextField
