@@ -2,7 +2,6 @@ const express = require('express');
 const router = express.Router();
 const prisma = require('../prisma');
 
-
 // create comments
 router.post('/',async(req,res)=>{
     try{
