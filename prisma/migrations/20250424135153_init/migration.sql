@@ -15,6 +15,15 @@ CREATE TABLE "Movie" (
 );
 
 -- CreateTable
+CREATE TABLE "Watchlist" (
+    "id" SERIAL NOT NULL,
+    "userId" INTEGER NOT NULL,
+    "movieId" INTEGER NOT NULL,
+
+    CONSTRAINT "Watchlist_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
 CREATE TABLE "Review" (
     "id" SERIAL NOT NULL,
     "subject" TEXT NOT NULL,
@@ -52,7 +61,7 @@ CREATE TABLE "User" (
 -- CreateTable
 CREATE TABLE "UserRating" (
     "id" TEXT NOT NULL,
-    "score" INTEGER NOT NULL,
+    "score" DOUBLE PRECISION NOT NULL,
     "review" TEXT,
     "movieId" INTEGER NOT NULL,
     "userId" INTEGER NOT NULL,
@@ -70,6 +79,9 @@ CREATE TABLE "Favorite" (
 );
 
 -- CreateIndex
+CREATE UNIQUE INDEX "Review_userId_movieId_key" ON "Review"("userId", "movieId");
+
+-- CreateIndex
 CREATE UNIQUE INDEX "User_email_key" ON "User"("email");
 
 -- CreateIndex
@@ -80,6 +92,12 @@ CREATE UNIQUE INDEX "Favorite_userId_movieId_key" ON "Favorite"("userId", "movie
 
 -- AddForeignKey
 ALTER TABLE "Movie" ADD CONSTRAINT "Movie_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "Watchlist" ADD CONSTRAINT "Watchlist_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "Watchlist" ADD CONSTRAINT "Watchlist_movieId_fkey" FOREIGN KEY ("movieId") REFERENCES "Movie"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "Review" ADD CONSTRAINT "Review_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE;

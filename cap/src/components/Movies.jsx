@@ -168,14 +168,15 @@ const Movies = () => {
               {selectedMovie.reviews && selectedMovie.reviews.length > 0 ? (
                 selectedMovie.reviews.map((review) => (
                   <Box key={review.id} sx={{ mt: 2 }}>
+                     <Typography variant="body1"><strong>Reviews:</strong></Typography>
                     <Typography variant="subtitle1">{review.subject}</Typography>
                     <Typography variant="body2">{review.description}</Typography>
                     <Box sx={{ mt: 4 }}>
-                      <Typography variant="h6" gutterBottom>
-                        Comments
-                      </Typography>
-                      {renderComments(review)}
-                    </Box>
+                    <Typography variant="h6" gutterBottom>
+                      Comments
+                    </Typography>
+                    {renderComments(review)}
+                  </Box>
                   </Box>
                 ))
               ) : (
