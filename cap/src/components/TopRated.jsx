@@ -4,21 +4,32 @@ const TopRated = () => {
   const [movies, setMovies] = useState([]);
   const [userRatings, setUserRatings] = useState({});
   const [submitted, setSubmitted] = useState({});
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
 
-  useEffect(() => {
+  const fetchMovies = () => {
     fetch("http://localhost:3000/api/movies")
       .then((res) => res.json())
       .then((data) => {
         const top10 = data.sort((a, b) => b.rating - a.rating).slice(0, 10);
         setMovies(top10);
+        setLoading(false);
       })
-      .catch((err) => console.error("Error fetching movies:", err));
+      .catch((err) => {
+        console.error("Error fetching movies:", err);
+        setError("Failed to load top rated movies.");
+        setLoading(false);
+      });
+  };
+
+  useEffect(() => {
+    fetchMovies();
   }, []);
 
   const handleRating = (movieId, rating) => {
     const token = localStorage.getItem("token");
 
-    fetch("http://localhost:3000/api/ratings", {
+    fetch("http://localhost:3000/api/ratingRoutes", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -33,13 +44,7 @@ const TopRated = () => {
       .then(() => {
         setUserRatings((prev) => ({ ...prev, [movieId]: rating }));
         setSubmitted((prev) => ({ ...prev, [movieId]: true }));
-
-        return fetch("http://localhost:3000/api/movies");
-      })
-      .then((res) => res.json())
-      .then((data) => {
-        const top10 = data.sort((a, b) => b.rating - a.rating).slice(0, 10);
-        setMovies(top10);
+        fetchMovies();
       })
       .catch((err) => {
         console.error("Error submitting rating:", err);
@@ -47,12 +52,42 @@ const TopRated = () => {
       });
   };
 
+  if (loading) return <p>Loading top rated movies...</p>;
+  if (error) return <p style={{ color: "red" }}>{error}</p>;
+
   return (
     <div>
       <h2>Top 10 Highest Rated Movies</h2>
-      <ul>
+      <div
+        style={{
+          display: "grid",
+          gap: "20px",
+          gridTemplateColumns: "repeat(auto-fit, minmax(250px, 1fr))",
+        }}
+      >
         {movies.map((movie) => (
-          <li key={movie.id} style={{ marginBottom: "1.5rem" }}>
+          <div
+            key={movie.id}
+            style={{
+              border: "1px solid #ccc",
+              borderRadius: "8px",
+              padding: "16px",
+              boxSizing: "border-box",
+              backgroundColor: "#f9f9f9",
+            }}
+          >
+            {movie.imageUrl && (
+              <img
+                src={movie.imageUrl}
+                alt={movie.title}
+                style={{
+                  width: "100%",
+                  height: "auto",
+                  borderRadius: "6px",
+                  marginBottom: "10px",
+                }}
+              />
+            )}
             <h3>{movie.title}</h3>
             <p>
               <strong>Average Rating:</strong>{" "}
@@ -61,7 +96,6 @@ const TopRated = () => {
                 : "N/A"}{" "}
               ⭐
             </p>
-
             <div>
               <p style={{ marginBottom: "0.3rem" }}>Your Rating:</p>
               {[1, 2, 3, 4, 5].map((value) => (
@@ -83,9 +117,9 @@ const TopRated = () => {
               ))}
               {submitted[movie.id] && <p>Thanks for rating!</p>}
             </div>
-          </li>
+          </div>
         ))}
-      </ul>
+      </div>
     </div>
   );
 };
