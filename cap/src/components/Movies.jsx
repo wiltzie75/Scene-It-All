@@ -10,6 +10,7 @@ const Movies = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [addedToWatchlist,setAddedToWatchlist] = useState({});
   const [addReview, setAddReview] = useState({ subject: "", description: ""});
+  const [isReviewDialogOpen, setIsReviewDialogOpen] = useState(false);
   const [addComment, setAddComment] = useState({ subject: "", description: ""});
 
   useEffect(() => {
@@ -168,7 +169,7 @@ const Movies = () => {
               {selectedMovie.reviews && selectedMovie.reviews.length > 0 ? (
                 selectedMovie.reviews.map((review) => (
                   <Box key={review.id} sx={{ mt: 2 }}>
-                     <Typography variant="body1"><strong>Reviews:</strong></Typography>
+                    <Typography variant="body1"><strong>Reviews:</strong></Typography>
                     <Typography variant="subtitle1">{review.subject}</Typography>
                     <Typography variant="body2">{review.description}</Typography>
                     <Box sx={{ mt: 4 }}>
@@ -185,7 +186,32 @@ const Movies = () => {
               <Typography variant="body1"><strong>Year:</strong> {selectedMovie.year}</Typography>
               <Typography variant="body1"><strong>Genre:</strong> {selectedMovie.genre}</Typography>
               <Button onClick={() => handleAddToWatchlist(selectedMovie.id)} sx={{ mt: 2,mr: 2 }} color="primary" variant="contained" disabled={addedToWatchlist}>{addedToWatchlist ? "Added to Watchlist ✓" : "Add to Watchlist"}</Button>
-              <Button onClick={() => handleReviewSubmit(selectedMovie.id)}>Add Review</Button>
+              <Button onClick={() => setIsReviewDialogOpen(true)}>Add Review</Button>
+                <Dialog open={isReviewDialogOpen} onClose={() => setIsReviewDialogOpen(false) fullWidth maxWidth="sm">
+                <DialogTitle>Add Your Review</DialogTitle>
+                <DialogContent>
+                <Box>
+                  <TextField
+                      type="text"
+                      placeholder="Subject"
+                      value={editedReview.subject}
+                      onChange={(e) =>
+                          setEditedReview({ ...editedReview, subject: e.target.value })
+                      }
+                  />
+                  <TextField
+                      placeholder="Description"
+                      value={editedReview.description}
+                      onChange={(e) =>
+                          setEditedReview({ ...editedReview, description: e.target.value })
+                      }
+                  />
+                </Box>
+                </DialogContent>
+                <Box>
+                  <Button onClick={() => setIsReviewDialogOpen(false)}>Cancel</Button>
+                  <Button onClick={handleReviewCancel}>Cancel</button>
+                </Box>
               <Button onClick={() => setSelectedMovie(null)} sx={{ mt: 2 }} color="error" variant="contained">Close</Button>
             </DialogContent>
           </>
