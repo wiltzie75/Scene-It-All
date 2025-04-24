@@ -12,6 +12,8 @@ const Movies = () => {
   const [addReview, setAddReview] = useState({ subject: "", description: ""});
   const [isReviewDialogOpen, setIsReviewDialogOpen] = useState(false);
   const [addComment, setAddComment] = useState({ subject: "", description: ""});
+  const [isCommentDialogOpen, setIsCommentDialogOpen] = useState(false);
+  const [activeReviewId, setActiveReviewId] = useState(null);
 
   useEffect(() => {
     const fetchMovies = async () => {
@@ -67,7 +69,51 @@ const Movies = () => {
     } catch (error) {
       console.error("Error adding Review", error);
     }
+    setIsReviewDialogOpen(false);
   };
+
+  const handleCommentSubmit = async (reviewId) => {
+    try {
+        const token = localStorage.getItem("token");
+        if(!token){
+          alert("You must be logged in to add a Review.");
+          return;
+        }
+    
+        const user = JSON.parse(localStorage.getItem("user")); // or however you store user info
+        if (!user?.id) {
+          alert("User info not found.");
+          return;
+        }
+
+        const response = await fetch(`${API}/reviews/${reviewId}/comments`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${token}`,
+            },
+            body: JSON.stringify({
+                subject: addComment.subject,
+                description: addComment.description,
+                userId: user.id,
+            }),
+        });
+
+        const data = await response.json();
+
+      if (response.ok) {
+        alert("Comment added");
+        setAddComment({ subject: "", description: "" });
+      } else {
+        alert(data.message || "Failed to add Comment");
+      }
+
+    } catch (error) {
+      console.error("Error adding Comment", error);
+    }
+    setIsCommentDialogOpen(false);
+    setActiveReviewId(null);
+};
 
   const renderComments = (review) => {
     return (
@@ -75,6 +121,8 @@ const Movies = () => {
             {Array.isArray(review.comments) && review.comments.length > 0 ? (
                 review.comments.map((comment) => (
                   <div key={comment.id} style={{ marginLeft: "1rem", borderLeft: "2px solid #ccc", paddingLeft: "1rem", marginBottom: "1rem" }}>
+                    <Typography variant="subtitle1">{`
+                      ${comment.user.firstName} ${comment.user.lastName} wrote:`}</Typography>
                     <Typography variant="subtitle2">{comment.subject}</Typography>
                     <Typography variant="body2">{comment.description}</Typography>
                 </div>
@@ -176,25 +224,65 @@ const Movies = () => {
               <Typography variant="body1" sx={{ mt: 2 }}><strong>Description:</strong> {selectedMovie.plot}</Typography>
               <Typography variant="body1"><strong>Rating:</strong> {selectedMovie.imdbRating}</Typography>
               <Typography variant="body1"><strong>My Rating:</strong> {selectedMovie.userRatings}</Typography>
+              <Typography variant="body1"><strong>Year:</strong> {selectedMovie.year}</Typography>
+              <Typography variant="body1"><strong>Genre:</strong> {selectedMovie.genre}</Typography>
+              <br></br>
+              <Typography variant="body1"><strong>Reviews:</strong></Typography>
               {selectedMovie.reviews && selectedMovie.reviews.length > 0 ? (
                 selectedMovie.reviews.map((review) => (
                   <Box key={review.id} sx={{ mt: 2 }}>
-                    <Typography variant="body1"><strong>Reviews:</strong></Typography>
+                    <Typography variant="subtitle1">{`
+                      ${review.user.firstName} ${review.user.lastName} wrote:`}</Typography>
                     <Typography variant="subtitle1">{review.subject}</Typography>
                     <Typography variant="body2">{review.description}</Typography>
                     <Box sx={{ mt: 4 }}>
-                    <Typography variant="h6" gutterBottom>
-                      {/* Comments */}
-                    </Typography>
                     {renderComments(review)}
+                    <Button onClick={() => {setActiveReviewId(review.id); setIsCommentDialogOpen(true)}}>Add a Comment</Button>
+                    <Button onClick={() => setSelectedMovie(null)} sx={{ mt: 2 }} color="error" variant="contained">Close</Button>
+                    <Dialog open={isCommentDialogOpen} onClose={() => setIsCommentDialogOpen(false)}>
+
+                      <DialogTitle>Add a Comment</DialogTitle>
+                      <DialogContent>
+                        <TextField
+                          label="Subject"
+                          fullWidth
+                          value={addComment.subject}
+                          onChange={(e) =>
+                            setAddComment({ ...addComment, subject: e.target.value })
+                          }
+                          sx={{ mb: 2 }}
+                        />
+                        <TextField
+                          label="Description"
+                          fullWidth
+                          multiline
+                          rows={4}
+                          value={addComment.description}
+                          onChange={(e) =>
+                            setAddComment({ ...addComment, description: e.target.value })
+                          }
+                        />
+                        <Box sx={{ mt: 2, display: "flex", justifyContent: "flex-end", gap: 1 }}>
+                          <Button onClick={() => setIsCommentDialogOpen(false)} color="error">
+                            Cancel
+                          </Button>
+                          <Button
+                            variant="contained"
+                            onClick={() => {
+                              handleCommentSubmit(activeReviewId);
+                            }}
+                          >
+                            Save
+                          </Button>
+                        </Box>
+                      </DialogContent>
+                    </Dialog>
                   </Box>
                   </Box>
                 ))
               ) : (
                 <Typography>No reviews yet.</Typography>
               )}
-              <Typography variant="body1"><strong>Year:</strong> {selectedMovie.year}</Typography>
-              <Typography variant="body1"><strong>Genre:</strong> {selectedMovie.genre}</Typography>
               <Button onClick={() => handleAddToWatchlist(selectedMovie.id)} sx={{ mt: 2,mr: 2 }} color="primary" variant="contained" disabled={addedToWatchlist}>{addedToWatchlist ? "Added to Watchlist ✓" : "Add to Watchlist"}</Button>
               <Button onClick={() => setIsReviewDialogOpen(true)}>Add Review</Button>
               <Button onClick={() => setSelectedMovie(null)} sx={{ mt: 2 }} color="error" variant="contained">Close</Button>
@@ -242,7 +330,6 @@ const Movies = () => {
           </Dialog>
       </Box>
       )
-
    };
 
 export default Movies;

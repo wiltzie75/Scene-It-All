@@ -7,6 +7,7 @@ router.get('/',async(req,res)=>{
     try{
         const reviews = await prisma.review.findMany({
             include: {
+              user: true,
               movie: true,
               comments: true, 
             },
@@ -45,15 +46,15 @@ router.post("/", async (req, res) => {
   if (rating === undefined || isNaN(parseFloat(rating))) {
     return res.status(400).json({ message: "Invalid or missing rating" });
   }
-  
+
   try {
     const review = await prisma.review.create({
       data: {
         subject,
         description,
         rating: parseFloat(rating),
-        movie: { connect: { id: Number(movieId) } },
-        user: { connect: { id: Number(userId) } },
+        movie: { connect: { id: movieId } },
+        user: { connect: { id: userId } },
       },
     });
     res.status(201).json(review);

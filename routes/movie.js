@@ -8,13 +8,30 @@ router.get("/", async (req, res) => {
       include: {
         reviews: {
           include: {
-            comments: true
-          }
-      },
-      userRatings: true,
-      favorites: true,
-      watchlist: true
-    }
+            user: {
+              select: {
+                firstName: true,
+                lastName: true,
+                email: true,
+              },
+            },
+            comments: {
+              include: {
+                user: {
+                  select: {
+                    firstName: true,
+                    lastName: true,
+                    email: true,
+                  }
+                }
+              }
+            },
+          },
+        },
+        userRatings: true,
+        favorites: true,
+        watchlist: true,
+      }
     });
     res.json(movies);
   } catch (error) {
@@ -33,13 +50,23 @@ router.get("/:id", async (req, res) => {
       include: {
         reviews: {
           include: {
-            comments: true, 
             user: {
               select: {
                 firstName: true,
                 lastName: true,
                 email: true,
               },
+            },
+            comments: {
+              include: {
+                user: {
+                  select: {
+                    firstName: true,
+                    lastName: true,
+                    email: true,
+                  }
+                }
+              }
             },
           },
         },
