@@ -40,13 +40,13 @@ function App() {
 
       <Container sx={{ flex: 1, mt: 4 }}>
         {/* Only show "Go to Admin Page" button if user is admin */}
-        {userRole === true && (
+        {/* {userRole === true && (
           <div className="admin-button" style={{ marginBottom: "16px" }}>
             <Link to="/admin">
               <button>Go to Admin Page</button>
             </Link>
           </div>
-        )}
+        )} */}
         
           <Routes>
             <Route path="/" element={<Home />} />
