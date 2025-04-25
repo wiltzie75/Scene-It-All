@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import API from "../api/api";
-// import { watchlist } from "../../../prisma";
+// import { favorite } from "../../../prisma";
 // import { BottomNavigation } from "@mui/material";
 // import { border } from "@mui/system";
 
@@ -13,7 +13,6 @@ const Profile = (props) => {
         comments: [],
         firstName: "",
         lastName: "",
-        watchlist:[]
     });
     const [users, setUsers] = useState([]);
 
@@ -96,15 +95,15 @@ const Profile = (props) => {
         }
     };
 
-    const handleRemoveFromWatchlist = async (movieId) => {
+    const handleRemoveFromFavorite = async (movieId) => {
         const token = localStorage.getItem("token");
         if (!token) {
-            return alert("You need to be logged in to remove movies to your Watchlist");
+            return alert("You need to be logged in to remove movies to your Favorite");
         }
         const userId = profile.id;
 
         try {
-            const response = await fetch(`${API}/watchlist/${movieId}`, {
+            const response = await fetch(`${API}/favorite/${movieId}`, {
                 method: "DELETE",
                 headers: {
                     "Content-Type": "application/json",
@@ -114,20 +113,20 @@ const Profile = (props) => {
             });
 
             if (response.ok) {
-                alert("Movie removed from Watchlist!");
+                alert("Movie removed from Favorite!");
                 getProfile(); 
             } else {
-                alert("Failed to remove movie from Watchlist");
+                alert("Failed to remove movie from Favorite");
             }
         } catch (error) {
-            console.error("Error removing movie from Watchlist:", error);
+            console.error("Error removing movie from Favorite:", error);
         }
     };
 
 
     return ( 
         <>
-            <div style={{border: '1px solid black'}}>
+            <div>
                 {profile && (
                     <div>
                         <h2 style={{ textAlign: "center" }}>
@@ -136,57 +135,31 @@ const Profile = (props) => {
                     </div>
                 )}
             </div>
-
-            {/* Displays users favorite movies */}
-            <div style={{border: '1px solid black'}}>
+            
+            {/* Displays user's favorite */}
                 {profile && profile.favorites.length === 0 ? (
                     <div>
-                        <h3>You have no Favorites</h3>
+                        <h3>You have no movies in your Favorite</h3>
                     </div>
                 ) : (
                     <div>
-                        <h3>My Favorite Movies</h3>
+                        <h3>My Favorites</h3>
                         {profile.favorites?.map((movie) => (
-                            <div key={movie.id}>
-                                <img src={movie.movie?.poster} alt={movie.movie?.title} />
-                                <h4>{movie.movie?.title}</h4>
-                                <p>Ratings: {movie.movie?.imdbRating} My rating: {movie.movie?.userRatings}</p>
-                            </div>
-                        ))}
-                    </div>
-                )}
-            </div>
-            
-            {/* Displays user's watchlist */}
-            <div style={{ border:'1px solid black', marginTop: '20px' }}>
-
-                {profile && profile.watchlist.length === 0 ? (
-                    <div>
-                        <h3>You have no movies in your Watchlist</h3>
-                    </div>
-                ) : (
-                    <div>
-                        <h3>My Watchlist</h3>
-                        {profile.watchlist?.map((movie) => (
                             <div key={movie.id}>
                                 <img src={movie.poster} alt={movie.title} />
                                 <h4>{movie.title}</h4>
                                 <p>Ratings: {movie.imdbRating}</p>
                                 <button
-                                     onClick={()=> handleRemoveFromWatchlist(movie.id)}
+                                     onClick={()=> handleRemoveFromFavorite(movie.id)}
                                      style={{ backgroundColor: "red", color: "white", border: "none", padding: "5px 10px", cursor: "pointer" }}
                                      >
-                                        Remove from Watchlist
+                                        Remove from Favorite
                                      </button>
                             </div>
                                 
                         ))}
                     </div>
-                 )}
-            </div>
-
-
-
+                )}
         </>
     );
 };
