@@ -10,8 +10,9 @@ import {
   CardMedia,
   Dialog,
   Grid,
-  Pagination
+  Pagination,
   DialogContent,
+  DialogActions,
   DialogTitle,
 } from '@mui/material';
 import API from '../api/api';
@@ -33,6 +34,7 @@ const AdminMovies = () => {
     year: '',
     genre: '',
   });
+  const [isMovieDialogOpen, setIsMovieDialogOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
@@ -187,33 +189,38 @@ const AdminMovies = () => {
         />
       </Box>
 
-      {/* <Box sx={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: 3, fontSize: "0.2rem" }}> */}
         <Typography variant="h4" gutterBottom>Admin Movie Management</Typography>
+        <Button variant="contained" color="primary" onClick={() => setIsMovieDialogOpen(true)}>Add New Movie</Button>
 
-        <Dialog open={openAddModal} onClose={handleCloseAddModal} maxWidth="sm" fullWidth>
+        <Dialog open={isMovieDialogOpen} onClose={() => setIsMovieDialogOpen(false)} maxWidth="sm" fullWidth>
           <DialogTitle>Add New Movie</DialogTitle>
-        <DialogContent sx={{ pb: 2, bgcolor: '#8D99AE', color: '#000000' }}>
-          <Button variant="contained" color="primary">Add New Movie</Button>
-          <Grid container spacing={2} mt={1}>
-            {['title', 'plot', 'poster', 'year', 'genre'].map((field) => (
-              <Grid item xs={12} sm={field === 'plot' ? 12 : 6} key={field}>
-                <TextField
-                  label={field.charAt(0).toUpperCase() + field.slice(1)}
-                  name={field}
-                  fullWidth
-                  multiline={field === 'plot'}
-                  value={newMovie[field]}
-                  onChange={(e) => handleInputChange(e, setNewMovie)}
-                  required
-                />
-              </Grid>
-          </Grid>
+          <DialogContent sx={{ pb: 2, bgcolor: '#8D99AE', color: '#000000' }}>
+            
+            <Box display="grid" gridTemplateColumns="repeat(12, 1fr)" gap={2}>
+              {['title', 'plot', 'poster', 'year', 'genre'].map((field) => (
+                <Box key={selectedMovie.id} sx={{ gridColumn: { xs: "span 12", md: "span 6" } }}>
+                  <TextField
+                    label={field.charAt(0).toUpperCase() + field.slice(1)}
+                    name={field}
+                    fullWidth
+                    multiline={field === 'plot'}
+                    value={newMovie[field]}
+                    onChange={(e) => handleInputChange(e, setNewMovie)}
+                    required
+                  />
+                </Box>
+              ))}
+            </Box>
         </DialogContent>
         <DialogActions>
-          <Button variant="contained" color="primary" type="submit">
-            Add Movie
+          <Button onClick={() => setIsMovieDialogOpen(false)} color="secondary">
+            Cancel
+          </Button>
+          <Button variant="contained" color="primary" onClick={() => setIsMovieDialogOpen(true)}>
+            Add New Movie
           </Button>
         </DialogActions>
+        </Dialog>
           
 
 
