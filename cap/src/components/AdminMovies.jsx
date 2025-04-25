@@ -8,8 +8,11 @@ import {
   Card,
   CardContent,
   CardMedia,
+  Dialog,
   Grid,
   Pagination
+  DialogContent,
+  DialogTitle,
 } from '@mui/material';
 import API from '../api/api';
 
@@ -184,12 +187,14 @@ const AdminMovies = () => {
         />
       </Box>
 
-      <Box sx={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: 3, fontSize: "0.2rem" }}>
+      {/* <Box sx={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: 3, fontSize: "0.2rem" }}> */}
         <Typography variant="h4" gutterBottom>Admin Movie Management</Typography>
 
-        <Box component="form" onSubmit={handleAddMovie} mb={4}>
-          <Typography variant="h6" gutterBottom>Add New Movie</Typography>
-          <Grid container spacing={2}>
+        <Dialog open={openAddModal} onClose={handleCloseAddModal} maxWidth="sm" fullWidth>
+          <DialogTitle>Add New Movie</DialogTitle>
+        <DialogContent sx={{ pb: 2, bgcolor: '#8D99AE', color: '#000000' }}>
+          <Button variant="contained" color="primary">Add New Movie</Button>
+          <Grid container spacing={2} mt={1}>
             {['title', 'plot', 'poster', 'year', 'genre'].map((field) => (
               <Grid item xs={12} sm={field === 'plot' ? 12 : 6} key={field}>
                 <TextField
@@ -202,14 +207,15 @@ const AdminMovies = () => {
                   required
                 />
               </Grid>
-            ))}
-            <Grid item xs={12}>
-              <Button variant="contained" color="primary" type="submit">
-                Add Movie
-              </Button>
-            </Grid>
           </Grid>
-        </Box>
+        </DialogContent>
+        <DialogActions>
+          <Button variant="contained" color="primary" type="submit">
+            Add Movie
+          </Button>
+        </DialogActions>
+          
+
 
         <Typography variant="h6" gutterBottom>Existing Movies</Typography>
         
@@ -326,10 +332,9 @@ const AdminMovies = () => {
             size="small"
           />
         </Box>
-        )}
-      </Box>
-    )}
-  </Box>
+      )}
+    </Box>
   );
 };
+
 export default AdminMovies;
