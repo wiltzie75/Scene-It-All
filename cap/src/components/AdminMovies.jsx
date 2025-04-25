@@ -52,9 +52,9 @@ const AdminMovies = () => {
     fetchMovies();
   }, []);
 
-  const handleInputChange = (e) => {
+  const handleInputChange = (e, setState) => {
     const { name, value } = e.target;
-    setNewMovie((prevState) => ({
+    setState((prevState) => ({
       ...prevState,
       [name]: value,
     }));
@@ -256,28 +256,10 @@ const AdminMovies = () => {
                 </Card>
               </Box>
 
-              <Box item xs={12} md={6} key={selectedMovie.id}>
+              <Grid item xs={12} md={6} key={selectedMovie.id}>
                 <Card>
                   <CardContent>
                     <Box display="flex" flexDirection="column" gap={1}>
-                    <Box
-                      component="img"
-                      src={selectedMovie.poster}
-                      alt={selectedMovie.title}
-                      sx={{
-                        width: '100%',
-                        maxHeight: 300,
-                        objectFit: 'cover',
-                        cursor: 'pointer',
-                        borderRadius: 1,
-                        transition: 'transform 0.2s ease',
-                        '&:hover': {
-                          transform: 'scale(1.02)',
-                          boxShadow: 3,
-                        },
-                      }}
-                      onClick={() => handleMovieEdit(movie)}
-                    />
                       {editingMovieId === selectedMovie.id ? (
                         <>
                           {['title', 'plot', 'poster', 'year', 'genre'].map((field) => (
@@ -292,13 +274,13 @@ const AdminMovies = () => {
                             />
                           ))}
                           <Box mt={2} display="flex" gap={1}>
-                            <Button variant="contained" onClick={() => handleMovieSave(movie.id)}>
+                            <Button variant="contained" onClick={() => handleMovieSave(selectedMovie.id)}>
                               Save
                             </Button>
                             <Button variant="outlined" onClick={() => setEditingMovieId(null)}>
                               Cancel
                             </Button>
-                            <Button variant="outlined" color="error" onClick={() => handleDeleteMovie(movie.id)}>
+                            <Button variant="outlined" color="error" onClick={() => handleDeleteMovie(selectedMovie.id)}>
                               Delete
                             </Button>
                           </Box>
@@ -322,12 +304,13 @@ const AdminMovies = () => {
                     </Box>
                   </CardContent>
                 </Card>
-              </Box>
+              </Grid>
             </DialogContent>
           </>
           )}
         </Dialog>
-       
+      
+      {/* Pagination */}
         {totalPages > 1 && (
         <Box sx={{ mt: 1, display: "flex", justifyContent: "center" }}>
           <Pagination
