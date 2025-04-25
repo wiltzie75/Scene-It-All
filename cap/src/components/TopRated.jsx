@@ -73,7 +73,7 @@ const TopRated = () => {
               borderRadius: "8px",
               padding: "16px",
               boxSizing: "border-box",
-              backgroundColor: "#f9f9f9",
+              backgroundColor: "#8D99AE",
             }}
           >
             {movie.imageUrl && (
