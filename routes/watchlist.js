@@ -1,6 +1,8 @@
 const express = require('express');
 const router = express.Router();
+const verifyToken = require('./verify');
 const prisma = require('../prisma');
+
 
 // GET user watchlist
 router.get('/:id/watchlist', async(req, res) => {
@@ -14,13 +16,14 @@ router.get('/:id/watchlist', async(req, res) => {
         res.json(watchlist.map(fav => fav.movie));
     } catch (error) {
         console.log(error);
-        res.status(500).send('Server error')
+        res.status(500).json({message:'Server error'})
     }
 })
 
 // add item to watchlist
-router.post('/', async(req, res) => {
+router.post('/',verifyToken, async(req, res) => {
     const { userId, movieId } = req.body;
+    console.log(req.user);
     try{
     
         const user = await prisma.user.findUnique({ where: { id: userId } });
@@ -44,7 +47,7 @@ router.post('/', async(req, res) => {
     res.status(201).json(addFavorite);
     } catch (error) {
         console.log(error);
-        res.status(500).send('Server error')
+        res.status(500).json({message:'Server error'})
     }
 });
 
@@ -63,7 +66,7 @@ router.delete('/:userId/:movieId', async(req, res) => {
         res.json({message: `Movie ${movieId} removed from watchlist.`});
     } catch (error) {
         console.log(error);
-        res.status(500).send('Server error')
+        res.status(500).json({message:'Server error'})
     }
 })
 

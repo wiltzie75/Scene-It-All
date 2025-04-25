@@ -12,6 +12,7 @@ const Movies = () => {
   const [addReview, setAddReview] = useState({ subject: "", description: ""});
   const [isReviewDialogOpen, setIsReviewDialogOpen] = useState(false);
   const [addComment, setAddComment] = useState({ subject: "", description: ""});
+  const [showLoginDialog, setShowLoginDialog] = useState(false);
   const [isCommentDialogOpen, setIsCommentDialogOpen] = useState(false);
   const [activeReviewId, setActiveReviewId] = useState(null);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -142,10 +143,10 @@ const Movies = () => {
   };
 
   // add to watchlist
-  const handleAddToWatchlist = async(movieId) =>{
+  const handleAddToWatchlist = async(userId, movieId) =>{
     const token = localStorage.getItem("token");
     if(!token){
-      alert("You must be logged in to add to Watchlist.");
+      setShowLoginDialog(true);
       return;
     }
     try{
@@ -155,9 +156,11 @@ const Movies = () => {
           "Content-Type": "application/json",
           "Authorization": `Bearer ${token}`,
         },
-        body: JSON.stringify({movieId}),
+        body: JSON.stringify({userId,movieId}),
         
       });
+
+      const data = await response.text();
       if (response.ok) {
         alert("Movie added to Watchlist!");
         setAddedToWatchlist((prevState) =>({
@@ -165,8 +168,16 @@ const Movies = () => {
           [movieId]:true,
         }));
       } else {
-        const error = await response.json();
-        alert(error.message || "Failed to add to Watchlist");
+        try{
+          const errorData = JSON.parse(data);
+          alert(errorData.message || "Failed to add to Watchlist");
+
+        }catch(error){
+          alert(data || "Failed to add to Watchlist");
+        // const error = await response.json();
+        // alert(error.message || "Failed to add to Watchlist");
+      }
+
       }
 
       }catch (error){
@@ -208,6 +219,15 @@ const Movies = () => {
           }}
         />
       </Box>
+{/* watchlist dialog */}
+      <Dialog open={showLoginDialog} onClose={() => setShowLoginDialog(false)}>
+
+        <DialogTitle>Login Required</DialogTitle>
+        <DialogContent>
+          <Typography>You must be logged in to add to your watchlist.</Typography>
+          <Button onClick={() => setShowLoginDialog(false)} variant="contained"  sx={{ mt: 2 }}>Close</Button>
+        </DialogContent>
+      </Dialog>
 
       {/* Movie List */}
       <Box sx={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: 3, fontSize: "0.2rem" }}>
@@ -323,6 +343,11 @@ const Movies = () => {
               ) : (
                 <Typography>No reviews yet.</Typography>
               )}
+              <Typography variant="body1"><strong>Year:</strong> {selectedMovie.year}</Typography>
+              <Typography variant="body1"><strong>Genre:</strong> {selectedMovie.genre}</Typography>
+              <Button onClick={() => handleAddToWatchlist(selectedMovie.id)} sx={{ mt: 2,mr: 2 }} color="primary" variant="contained" disabled={!!addedToWatchlist[selectedMovie.id]} > {addedToWatchlist[selectedMovie.id] ? "Added to Watchlist ✓" : "Add to Watchlist"}</Button>
+              <Button onClick={() => handleReviewSubmit(selectedMovie.id)}>Add Review</Button>
+
               {isLoggedIn && (
                 <>
                   <Button onClick={() => handleAddToWatchlist(selectedMovie.id)} sx={{ mt: 2,mr: 2 }} color="primary" variant="contained" disabled={addedToWatchlist}>{addedToWatchlist ? "Added to Watchlist ✓" : "Add to Watchlist"}</Button>
