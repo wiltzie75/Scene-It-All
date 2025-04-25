@@ -1,8 +1,8 @@
 const express = require('express');
 const router = express.Router();
-const { PrismaClient } = require('@prisma/client');
 const verifyToken = require('./verify');
-const prisma = new PrismaClient();
+const prisma = require('../prisma');
+
 
 // GET user watchlist
 router.get('/:id/watchlist', async(req, res) => {

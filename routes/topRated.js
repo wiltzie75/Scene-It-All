@@ -1,7 +1,6 @@
 const express = require("express");
 const router = express.Router();
-const { PrismaClient } = require("@prisma/client");
-const prisma = new PrismaClient();
+const prisma = require("../prisma");
 
 router.get("/", async (req, res) => {
   try {
@@ -18,6 +17,7 @@ router.get("/", async (req, res) => {
       select: {
         id: true,
         title: true,
+        imageUrl: true,
         reviews: {
           select: {
             rating: true,
@@ -26,7 +26,6 @@ router.get("/", async (req, res) => {
       },
     });
 
-    // average
     const result = topRated
       .map((movie) => {
         const ratings = movie.reviews.map((r) => r.rating);
@@ -36,17 +35,48 @@ router.get("/", async (req, res) => {
         return {
           id: movie.id,
           title: movie.title,
-          averageRating: parseFloat(average.toFixed(2)),
+          imageUrl: movie.imageUrl,
+          rating: parseFloat(average.toFixed(2)),
           reviewCount: ratings.length,
         };
       })
-      .sort((a, b) => b.averageRating - a.averageRating)
+      .sort((a, b) => b.rating - a.rating)
       .slice(0, 10);
 
     res.json(result);
   } catch (error) {
     console.error("Error getting top rated movies:", error);
     res.status(500).json({ error: "Server error" });
+  }
+});
+
+router.post("/", async (req, res) => {
+  const { movieId, rating } = req.body;
+
+  // temporary hardcoded values
+  const userId = 1; // replace with actual userId from token later
+  const subject = "Rated via TopRated";
+  const description = "This is an auto-generated review from TopRated.jsx";
+
+  if (!movieId || !rating) {
+    return res.status(400).json({ error: "Missing movieId or rating" });
+  }
+
+  try {
+    const newReview = await prisma.review.create({
+      data: {
+        movieId,
+        userId,
+        rating: parseFloat(rating),
+        subject,
+        description,
+      },
+    });
+
+    res.status(201).json({ message: "Rating submitted", review: newReview });
+  } catch (error) {
+    console.error("Error submitting rating:", error);
+    res.status(500).json({ error: "Server error while submitting rating" });
   }
 });
 

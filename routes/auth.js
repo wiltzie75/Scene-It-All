@@ -1,12 +1,10 @@
 const express = require('express');
 const router = express.Router();
-const { PrismaClient } = require('@prisma/client');
 const bcrypt = require ('bcrypt');
 const jwt = require('jsonwebtoken');
 const JWT = process.env.JWT;
 const verifyToken = require('./verify');
-const prisma = new PrismaClient();
-// const JWT_SECRET = "secret_key_123";
+const prisma = require('../prisma');
 
 router.post('/register',async(req,res) => {
     const{ firstName , lastName, email, password} = req.body;
