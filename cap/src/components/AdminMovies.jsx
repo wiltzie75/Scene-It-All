@@ -1,17 +1,38 @@
 import { useState, useEffect } from 'react';
 import '../App.css';
+import {
+  Box,
+  Typography,
+  TextField,
+  Button,
+  Card,
+  CardContent,
+  CardMedia,
+  Grid,
+  Pagination
+} from '@mui/material';
 import API from '../api/api';
 
 const AdminMovies = () => {
   const [movies, setMovies] = useState([]);
   const [selectedMovie, setSelectedMovie] = useState(null);
+  const [editedMovie, setEditedMovie] = useState({ 
+    title: "", 
+    plot: "",
+    poster: "",
+    year: "",
+    genre: "", });
+  const [editingMovieId, setEditingMovieId] = useState(null);
   const [newMovie, setNewMovie] = useState({
     title: '',
-    description: '',
+    plot: '',
     poster: '',
     year: '',
     genre: '',
   });
+  const [searchTerm, setSearchTerm] = useState('');
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 10;
 
   useEffect(() => {
     const fetchMovies = async () => {
@@ -66,6 +87,57 @@ const AdminMovies = () => {
     }
   };
 
+  const handleMovieEdit = (movie) => {
+    setEditingMovieId(movie.id);
+    setEditedMovie({ title: movie.title, plot: movie.plot, poster: movie.poster, year: movie.year, genre: movie.genre});
+  };
+
+  const handleMovieSave = async (movieId) => {
+    try {
+        const token = localStorage.getItem("token");
+        const res = await fetch(`${API}/movies/${movieId}`, {
+            method: "PUT",
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${token}`,
+            },
+            body: JSON.stringify({
+              title: editedMovie.title, 
+              plot: editedMovie.plot, 
+              poster: editedMovie.poster,
+              year: editedMovie.year, 
+              genre: editedMovie.genre
+            }),
+        });
+
+        if (res.ok) { 
+            const updatedMovies = movies.map((m) => 
+                m.id === movieId ? { ...m, ...editedMovie } : m
+            );
+            setMovies(updatedMovies);
+            setEditingMovieId(null);
+            setEditedMovie({ 
+              title: "", 
+              plot: "",
+              poster: "",
+              year: "",
+              genre: "", });
+        }
+    } catch (error) {
+        console.error("Failed to update movie:", error);
+    }
+  };
+
+  const handleMovieCancel = () => {
+      setEditingMovieId(null);
+      setEditedMovie({ 
+        title: "", 
+        plot: "",
+        poster: "",
+        year: "",
+        genre: "", });
+  };
+
   const handleDeleteMovie = async (id) => {
     try {
       const response = await fetch(`${API}/movies/${id}`, {
@@ -81,96 +153,183 @@ const AdminMovies = () => {
     }
   };
 
+  const indexOfLastItem = currentPage * itemsPerPage;
+  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+  const currentMovies = movies.slice(indexOfFirstItem, indexOfLastItem);
+
+  const totalPages = Math.ceil(movies.length / itemsPerPage);
+
   return (
-    <div className="admin-movies-container">
-      <h1>Admin Movie Management</h1>
+    <Box sx={{ maxWidth: 1200, margin: "0 auto", gap: 2, mt: 2, p: 2, display: "flex", flexDirection: "column" }}>
+      {/* Search Bar */}
+      <Box sx={{ mb: 1, display: "flex", justifyContent: "center" }}>
+        <TextField
+          variant="outlined"
+          label="Search for a movie..."
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+          size="small"
+          sx={{
+            width: "60%",
+            bgcolor: "#f9f9f9",
+            fontSize: "0.8rem",
+            borderRadius: 1,
+            "& .MuiOutlinedInput-root": {
+              "& fieldset": { borderColor: "gray" },
+              "&:hover fieldset": { borderColor: "#333" },
+              "&.Mui-focused fieldset": { borderColor: "#1976d2" },
+              height: "36px"
+            },
+          }}
+        />
+      </Box>
 
-      <form onSubmit={handleAddMovie}>
-        <h2>Add New Movie</h2>
-        <div>
-          <label>Title</label>
-          <input
-            type="text"
-            name="title"
-            value={newMovie.title}
-            onChange={handleInputChange}
-            required
-          />
-        </div>
-        <div>
-          <label>Description</label>
-          <textarea
-            name="plot"
-            value={newMovie.plot}
-            onChange={handleInputChange}
-            required
-          />
-        </div>
-        <div>
-          <label>Poster Image URL</label>
-          <input
-            type="text"
-            name="poster"
-            value={newMovie.poster}
-            onChange={handleInputChange}
-            required
-          />
-        </div>
-        {/* <div>
-          <label>Rating</label>
-          <input
-            type="number"
-            name="rating"
-            value={newMovie.rating}
-            onChange={handleInputChange}
-            required
-          />
-        </div>
-        <div>
-          <label>Reviews</label>
-          <input
-            type="number"
-            name="reviews"
-            value={newMovie.reviews}
-            onChange={handleInputChange}
-            required
-          />
-        </div> */}
-        <div>
-          <label>Year</label>
-          <input
-            type="number"
-            name="year"
-            value={newMovie.year}
-            onChange={handleInputChange}
-            required
-          />
-        </div>
-        <div>
-          <label>Genre</label>
-          <input
-            type="text"
-            name="genre"
-            value={newMovie.genre}
-            onChange={handleInputChange}
-            required
-          />
-        </div>
-        <button type="submit">Add Movie</button>
-      </form>
+      <Box sx={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: 3, fontSize: "0.2rem" }}>
+        <Typography variant="h4" gutterBottom>Admin Movie Management</Typography>
 
-      <h2>Existing Movies</h2>
-      <div className="movies-list">
-        {movies.map((movie) => (
-          <div key={movie.id} className="movie-item">
-            <img src={movie.poster} alt={movie.title} />
-            <p>{movie.title}</p>
-            <button onClick={() => handleDeleteMovie(movie.id)}>Delete</button>
-          </div>
-        ))}
-      </div>
-    </div>
+        <Box component="form" onSubmit={handleAddMovie} mb={4}>
+          <Typography variant="h6" gutterBottom>Add New Movie</Typography>
+          <Grid container spacing={2}>
+            {['title', 'plot', 'poster', 'year', 'genre'].map((field) => (
+              <Grid item xs={12} sm={field === 'plot' ? 12 : 6} key={field}>
+                <TextField
+                  label={field.charAt(0).toUpperCase() + field.slice(1)}
+                  name={field}
+                  fullWidth
+                  multiline={field === 'plot'}
+                  value={newMovie[field]}
+                  onChange={(e) => handleInputChange(e, setNewMovie)}
+                  required
+                />
+              </Grid>
+            ))}
+            <Grid item xs={12}>
+              <Button variant="contained" color="primary" type="submit">
+                Add Movie
+              </Button>
+            </Grid>
+          </Grid>
+        </Box>
+
+        <Typography variant="h6" gutterBottom>Existing Movies</Typography>
+        
+        <Box sx={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: 3, fontSize: "0.2rem" }}>
+        {currentMovies.length > 0 ? (
+          currentMovies.map((movie) => (
+            <Card key={movie.id} onClick={() => setSelectedMovie(movie)} sx={{ cursor: "pointer", bgcolor: "#fff", transition: "0.3s", "&:hover": { bgcolor: "#f0f0f0" } }}>
+              <CardMedia component="img" height="325" image={movie.poster} alt={movie.title} />
+            </Card>
+          ))
+        ) : (
+          <Typography>No movies found.</Typography>
+        )}
+        </Box>
+
+        <Dialog open={!!selectedMovie} onClose={() => setSelectedMovie(null)} maxWidth="md" fullWidth>
+          {selectedMovie && (
+          <>
+            <DialogContent>
+              <Box sx={{ display: "flex", flexDirection: { xs: "column", sm: "row" }, gap: 3 }}>
+                <Card key={selectedMovie.id} sx={{ cursor: "pointer", maxHeight: 220, maxWidth: 160 }}>
+                  <CardMedia
+                    component="img"
+                    image={selectedMovie.poster}
+                    alt={selectedMovie.title}
+                    sx={{ height: "auto", width: "100%" }}
+                  />
+                  <CardContent sx={{ p: 1 }}>
+                    <Typography variant="body2" noWrap>{selectedMovie.title}</Typography>
+                  </CardContent>
+                </Card>
+              </Box>
+
+              <Box item xs={12} md={6} key={selectedMovie.id}>
+                <Card>
+                  <CardContent>
+                    <Box display="flex" flexDirection="column" gap={1}>
+                    <Box
+                      component="img"
+                      src={selectedMovie.poster}
+                      alt={selectedMovie.title}
+                      sx={{
+                        width: '100%',
+                        maxHeight: 300,
+                        objectFit: 'cover',
+                        cursor: 'pointer',
+                        borderRadius: 1,
+                        transition: 'transform 0.2s ease',
+                        '&:hover': {
+                          transform: 'scale(1.02)',
+                          boxShadow: 3,
+                        },
+                      }}
+                      onClick={() => handleMovieEdit(movie)}
+                    />
+                      {editingMovieId === selectedMovie.id ? (
+                        <>
+                          {['title', 'plot', 'poster', 'year', 'genre'].map((field) => (
+                            <TextField
+                              key={field}
+                              label={field.charAt(0).toUpperCase() + field.slice(1)}
+                              name={field}
+                              fullWidth
+                              multiline={field === 'plot'}
+                              value={editedMovie[field]}
+                              onChange={(e) => handleInputChange(e, setEditedMovie)}
+                            />
+                          ))}
+                          <Box mt={2} display="flex" gap={1}>
+                            <Button variant="contained" onClick={() => handleMovieSave(movie.id)}>
+                              Save
+                            </Button>
+                            <Button variant="outlined" onClick={() => setEditingMovieId(null)}>
+                              Cancel
+                            </Button>
+                            <Button variant="outlined" color="error" onClick={() => handleDeleteMovie(movie.id)}>
+                              Delete
+                            </Button>
+                          </Box>
+                        </>
+                      ) : (
+                        <>
+                          <Typography variant="h6">{movie.title}</Typography>
+                          <Typography>{movie.plot}</Typography>
+                          <Typography>Year: {movie.year}</Typography>
+                          <Typography>Genre: {movie.genre}</Typography>
+                          <Box mt={1}>
+                            <Button variant="outlined" onClick={() => handleMovieEdit(movie)}>
+                              Edit
+                            </Button>{' '}
+                            <Button variant="outlined" color="error" onClick={() => handleDeleteMovie(movie.id)}>
+                              Delete
+                            </Button>
+                          </Box>
+                        </>
+                      )}
+                    </Box>
+                  </CardContent>
+                </Card>
+              </Box>
+            </DialogContent>
+          </>
+          )}
+        </Dialog>
+       
+        {totalPages > 1 && (
+        <Box sx={{ mt: 1, display: "flex", justifyContent: "center" }}>
+          <Pagination
+            count={totalPages}
+            page={currentPage}
+            onChange={(e, value) => setCurrentPage(value)}
+            color="primary"
+            shape="rounded"
+            size="small"
+          />
+        </Box>
+        )}
+      </Box>
+    )}
+  </Box>
   );
 };
-
 export default AdminMovies;
