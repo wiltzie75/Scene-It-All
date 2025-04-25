@@ -29,7 +29,7 @@ const TopRated = () => {
   const handleRating = (movieId, rating) => {
     const token = localStorage.getItem("token");
 
-    fetch("http://localhost:3000/api/ratingRoutes", {
+    fetch("http://localhost:3000/api/topRated", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
