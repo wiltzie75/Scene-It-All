@@ -46,8 +46,10 @@ function App() {
               <button>Go to Admin Page</button>
             </Link>
           </div>
-        )} */}
 
+        )}
+
+       
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/movies" element={<Movies />} />

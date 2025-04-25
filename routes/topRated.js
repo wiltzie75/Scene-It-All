@@ -51,6 +51,16 @@ router.get("/", async (req, res) => {
 });
 
 router.post("/", async (req, res) => {
+
+  const { userId, movieId, rating } = req.body;
+
+  // temporary hardcoded values
+  // const userId = 1; // replace with actual userId from token later
+  const subject = "Rated via TopRated";
+  const description = "This is an auto-generated review from TopRated.jsx";
+
+  if (!movieId || !rating || !userId) {
+
   const { movieId, rating } = req.body;
 
   // temporary hardcoded values
@@ -59,10 +69,29 @@ router.post("/", async (req, res) => {
   const description = "This is an auto-generated review from TopRated.jsx";
 
   if (!movieId || !rating) {
+
     return res.status(400).json({ error: "Missing movieId or rating" });
   }
 
   try {
+
+    const newRating = await prisma.userRating.create({
+      data: {
+        user: userId,
+        movie: movieId,
+        score: rating,
+        movie: {
+          connect: { id: movieId },
+        },
+        user: {
+          connect: { id: userId },
+        },
+      },
+    });
+    console.log();
+
+    res.status(201).json({ message: "Rating submitted", score: newRating });
+
     const newReview = await prisma.review.create({
       data: {
         movieId,
@@ -74,6 +103,7 @@ router.post("/", async (req, res) => {
     });
 
     res.status(201).json({ message: "Rating submitted", review: newReview });
+
   } catch (error) {
     console.error("Error submitting rating:", error);
     res.status(500).json({ error: "Server error while submitting rating" });

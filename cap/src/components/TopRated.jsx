@@ -26,7 +26,7 @@ const TopRated = () => {
     fetchMovies();
   }, []);
 
-  const handleRating = (movieId, rating) => {
+  const handleRating = (userId, movieId, rating) => {
     const token = localStorage.getItem("token");
 
     fetch("http://localhost:3000/api/topRated", {
@@ -35,7 +35,7 @@ const TopRated = () => {
         "Content-Type": "application/json",
         ...(token && { Authorization: `Bearer ${token}` }),
       },
-      body: JSON.stringify({ movieId, rating }),
+      body: JSON.stringify({ userId, movieId, rating }),
     })
       .then((res) => {
         if (!res.ok) throw new Error("Rating failed");
