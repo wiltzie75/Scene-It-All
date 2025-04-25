@@ -7,7 +7,7 @@ const reviewRoutes = require('./routes/reviews');
 const userRoutes = require('./routes/users');
 const authRoutes = require('./routes/auth');
 const commentsRoutes = require('./routes/comments');
-const watchlistRoutes = require('./routes/watchlist');
+const favoriteRoutes = require('./routes/favorite');
 // const recentReviewsRoutes = require('./routes/recentReviews');
 const topRatedRoutes = require('./routes/topRated');
 const profileRoutes = require('./routes/profile');
@@ -23,7 +23,7 @@ app.use('/api/reviews', reviewRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/auth',authRoutes);
 app.use('/api/comments',commentsRoutes);
-app.use('/api/watchlist', watchlistRoutes);
+app.use('/api/favorite', favoriteRoutes);
 app.use('/api/profile', profileRoutes);
 app.use('/api/topRated', topRatedRoutes);
  

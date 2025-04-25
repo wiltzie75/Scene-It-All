@@ -8,7 +8,7 @@ const Movies = () => {
   const [movies, setMovies] = useState([]);
   const [selectedMovie, setSelectedMovie] = useState(null);
   const [searchTerm, setSearchTerm] = useState("");
-  const [addedToWatchlist,setAddedToWatchlist] = useState({});
+  const [addedToFavorite,setAddedToFavorite] = useState({});
   const [addReview, setAddReview] = useState({ subject: "", description: ""});
   const [isReviewDialogOpen, setIsReviewDialogOpen] = useState(false);
   const [addComment, setAddComment] = useState({ subject: "", description: ""});
@@ -142,15 +142,15 @@ const Movies = () => {
     );
   };
 
-  // add to watchlist
-  const handleAddToWatchlist = async(userId, movieId) =>{
+  // add to favorite
+  const handleAddToFavorite = async(userId, movieId) =>{
     const token = localStorage.getItem("token");
     if(!token){
       setShowLoginDialog(true);
       return;
     }
     try{
-      const response = await fetch(`${API}/watchlist`,{
+      const response = await fetch(`${API}/favorite`,{
         method:"POST",
         headers: {
           "Content-Type": "application/json",
@@ -162,26 +162,26 @@ const Movies = () => {
 
       const data = await response.text();
       if (response.ok) {
-        alert("Movie added to Watchlist!");
-        setAddedToWatchlist((prevState) =>({
+        alert("Movie added to Favorite!");
+        setAddedToFavorite((prevState) =>({
           ...prevState,
           [movieId]:true,
         }));
       } else {
         try{
           const errorData = JSON.parse(data);
-          alert(errorData.message || "Failed to add to Watchlist");
+          alert(errorData.message || "Failed to add to Favorite");
 
         }catch(error){
-          alert(data || "Failed to add to Watchlist");
+          alert(data || "Failed to add to Favorite");
         // const error = await response.json();
-        // alert(error.message || "Failed to add to Watchlist");
+        // alert(error.message || "Failed to add to Favorite");
       }
 
       }
 
       }catch (error){
-        console.error("Error adding to Watchlist:",error);
+        console.error("Error adding to Favorite:",error);
    }
     };
 
@@ -219,12 +219,12 @@ const Movies = () => {
           }}
         />
       </Box>
-{/* watchlist dialog */}
-      <Dialog open={showLoginDialog} onClose={() => setShowLoginDialog(false)}>
 
+      {/* favorite dialog */}
+      <Dialog open={showLoginDialog} onClose={() => setShowLoginDialog(false)}>
         <DialogTitle>Login Required</DialogTitle>
         <DialogContent>
-          <Typography>You must be logged in to add to your watchlist.</Typography>
+          <Typography>You must be logged in to add to your favorite.</Typography>
           <Button onClick={() => setShowLoginDialog(false)} variant="contained"  sx={{ mt: 2 }}>Close</Button>
         </DialogContent>
       </Dialog>
@@ -244,6 +244,8 @@ const Movies = () => {
           <Typography>No movies found.</Typography>
         )}
       </Box>
+
+      {/* Pagination */}
       {totalPages > 1 && (
         <Box sx={{ mt: 1, display: "flex", justifyContent: "center" }}>
           <Pagination
@@ -345,11 +347,12 @@ const Movies = () => {
               )}
               <Typography variant="body1"><strong>Year:</strong> {selectedMovie.year}</Typography>
               <Typography variant="body1"><strong>Genre:</strong> {selectedMovie.genre}</Typography>
-              <Button onClick={() => handleAddToWatchlist(selectedMovie.id)} sx={{ mt: 2,mr: 2 }} color="primary" variant="contained" disabled={!!addedToWatchlist[selectedMovie.id]} > {addedToWatchlist[selectedMovie.id] ? "Added to Watchlist ✓" : "Add to Watchlist"}</Button>
+              {/* <Button onClick={() => handleAddToFavorite(selectedMovie.id)} sx={{ mt: 2,mr: 2 }} color="primary" variant="contained" disabled={!!addedToFavorite[selectedMovie.id]} > {addedToFavorite[selectedMovie.id] ? "Added to Favorite ✓" : "Add to Favorite"}</Button> */}
+              <Button onClick={() => handleReviewSubmit(selectedMovie.id)}>Add Review</Button>
 
               {isLoggedIn && (
                 <>
-                  <Button onClick={() => handleAddToWatchlist(selectedMovie.id)} sx={{ mt: 2,mr: 2 }} color="primary" variant="contained" disabled={addedToWatchlist}>{addedToWatchlist ? "Added to Watchlist ✓" : "Add to Watchlist"}</Button>
+                  <Button onClick={() => handleAddToFavorite(selectedMovie.id)} sx={{ mt: 2,mr: 2 }} color="primary" variant="contained" disabled={!!addedToFavorite[selectedMovie.id]} > {addedToFavorite[selectedMovie.id] ? "Added to Favorite ✓" : "Add to Favorite"}</Button>
                   <Button onClick={() => setIsReviewDialogOpen(true)}>Add Review</Button>
                 </>
               )}
