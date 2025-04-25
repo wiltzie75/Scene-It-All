@@ -8,12 +8,12 @@ import {
   Card,
   CardContent,
   CardMedia,
-  Dialog,
   Grid,
   Pagination,
+  Dialog,
   DialogContent,
   DialogActions,
-  DialogTitle,
+  DialogTitle
 } from '@mui/material';
 import API from '../api/api';
 
@@ -198,7 +198,7 @@ const AdminMovies = () => {
             
             <Box display="grid" gridTemplateColumns="repeat(12, 1fr)" gap={2}>
               {['title', 'plot', 'poster', 'year', 'genre'].map((field) => (
-                <Box key={selectedMovie.id} sx={{ gridColumn: { xs: "span 12", md: "span 6" } }}>
+                <Box key={field} sx={{ gridColumn: { xs: "span 12", md: "span 6" } }}>
                   <TextField
                     label={field.charAt(0).toUpperCase() + field.slice(1)}
                     name={field}
@@ -216,7 +216,7 @@ const AdminMovies = () => {
           <Button onClick={() => setIsMovieDialogOpen(false)} color="secondary">
             Cancel
           </Button>
-          <Button variant="contained" color="primary" onClick={() => setIsMovieDialogOpen(true)}>
+          <Button variant="contained" color="primary" onClick={handleAddMovie}>
             Add New Movie
           </Button>
         </DialogActions>
@@ -305,15 +305,15 @@ const AdminMovies = () => {
                         </>
                       ) : (
                         <>
-                          <Typography variant="h6">{movie.title}</Typography>
-                          <Typography>{movie.plot}</Typography>
-                          <Typography>Year: {movie.year}</Typography>
-                          <Typography>Genre: {movie.genre}</Typography>
+                          <Typography variant="h6">{selectedMovie.title}</Typography>
+                          <Typography>{selectedMovie.plot}</Typography>
+                          <Typography>Year: {selectedMovie.year}</Typography>
+                          <Typography>Genre: {selectedMovie.genre}</Typography>
                           <Box mt={1}>
-                            <Button variant="outlined" onClick={() => handleMovieEdit(movie)}>
+                            <Button variant="outlined" onClick={() => handleMovieEdit(selectedMovie)}>
                               Edit
                             </Button>{' '}
-                            <Button variant="outlined" color="error" onClick={() => handleDeleteMovie(movie.id)}>
+                            <Button variant="outlined" color="error" onClick={() => handleDeleteMovie(selectedMovie.id)}>
                               Delete
                             </Button>
                           </Box>

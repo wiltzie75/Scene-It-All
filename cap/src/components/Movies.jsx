@@ -346,7 +346,6 @@ const Movies = () => {
               <Typography variant="body1"><strong>Year:</strong> {selectedMovie.year}</Typography>
               <Typography variant="body1"><strong>Genre:</strong> {selectedMovie.genre}</Typography>
               <Button onClick={() => handleAddToWatchlist(selectedMovie.id)} sx={{ mt: 2,mr: 2 }} color="primary" variant="contained" disabled={!!addedToWatchlist[selectedMovie.id]} > {addedToWatchlist[selectedMovie.id] ? "Added to Watchlist ✓" : "Add to Watchlist"}</Button>
-              <Button onClick={() => handleReviewSubmit(selectedMovie.id)}>Add Review</Button>
 
               {isLoggedIn && (
                 <>
