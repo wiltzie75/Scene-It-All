@@ -30,7 +30,7 @@ router.get("/", async (req, res) => {
         },
         userRatings: true,
         favorites: true,
-        watchlist: true,
+        // watchlist: true, 
       }
     });
     res.json(movies);
@@ -115,7 +115,7 @@ router.put("/:id", async (req, res) => {
   const { title, plot, poster, year, genre, userRatings, reviews } = req.body;
   try {
     const updateMovie = await prisma.movie.update({
-      where: { id: id },
+      where: { id: parseInt(id) },
       data: {
         title,
         plot,

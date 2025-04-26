@@ -4,44 +4,49 @@ const verifyToken = require('./verify');
 const prisma = require('../prisma');
 
 
-// GET user watchlist
-router.get('/:id/watchlist', async(req, res) => {
+// GET user favorite
+router.get('/:id/favorite', async(req, res) => {
     const { id } = req.params;
     try{
-        const watchlist = await prisma.favorite.findMany({
+        const favorite = await prisma.favorite.findMany({
             where: { userId: Number(id) },
             include: { movie: true },
         });
     
-        res.json(watchlist.map(fav => fav.movie));
+        res.json(favorite.map(fav => fav.movie));
     } catch (error) {
         console.log(error);
         res.status(500).json({message:'Server error'})
     }
 })
 
-// add item to watchlist
+// add item to favorite
 router.post('/',verifyToken, async(req, res) => {
-    const { userId, movieId } = req.body;
+    const userId = Number(req.body.userId);
+    const movieId = Number(req.body.movieId);
     console.log(req.user);
+
+    if (!userId || !movieId) {
+        return res.status(400).json({ error: "userId and movieId are required." });
+      }
+      
     try{
-    
         const user = await prisma.user.findUnique({ where: { id: userId } });
-    if (!user) {
-      return res.status(404).json({ error: `User with ID ${userId} not found.` });
-    }
+            if (!user) {
+            return res.status(404).json({ error: `User with ID ${userId} not found.` });
+            }
 
 
-    const movie = await prisma.movie.findUnique({ where: { id: movieId } });
-    if (!movie) {
-      return res.status(404).json({ error: `Movie with ID ${movieId} not found.` });
-    }
+        const movie = await prisma.movie.findUnique({ where: { id: movieId } });
+            if (!movie) {
+            return res.status(404).json({ error: `Movie with ID ${movieId} not found.` });
+            }
 
-    const addFavorite = await prisma.favorite.create({
-        data: {
-            userId,
-            movieId,
-        },
+        const addFavorite = await prisma.favorite.create({
+            data: {
+                userId: Number(userId),
+                movieId: Number(movieId),
+            },
     });
 
     res.status(201).json(addFavorite);
@@ -51,7 +56,7 @@ router.post('/',verifyToken, async(req, res) => {
     }
 });
 
-// delete item from watchlist
+// delete item from favorite
 router.delete('/:userId/:movieId', async(req, res) => {
     const { userId, movieId } = req.params;
     try{
@@ -63,7 +68,7 @@ router.delete('/:userId/:movieId', async(req, res) => {
                 }
             }
         });
-        res.json({message: `Movie ${movieId} removed from watchlist.`});
+        res.json({message: `Movie ${movieId} removed from favorite.`});
     } catch (error) {
         console.log(error);
         res.status(500).json({message:'Server error'})
