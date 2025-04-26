@@ -20,6 +20,7 @@ const Movies = () => {
   const [activeReviewId, setActiveReviewId] = useState(null);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
+  const [isEditingRating, setIsEditingRating] = useState(false);
   const itemsPerPage = 10;
 
   useEffect(() => {
@@ -238,6 +239,10 @@ const Movies = () => {
       });
   };
 
+  const enableRatingEdit = () => {
+    setIsEditingRating(true);
+  };
+
   const indexOfLastMovie = currentPage * itemsPerPage;
   const indexOfFirstMovie = indexOfLastMovie - itemsPerPage;
   const currentMovies = filteredMovies.slice(indexOfFirstMovie, indexOfLastMovie);
@@ -330,27 +335,41 @@ const Movies = () => {
               <Typography variant="body1" sx={{ mb: 1 }}><strong>Description:</strong> {selectedMovie.plot}</Typography>
               <Typography variant="body1" sx={{ mb: 1 }}><strong>Imdb Rating:</strong> {selectedMovie.imdbRating}</Typography>
               <Box>
-                <Typography sx={{ marginBottom: "0.3rem" }}><strong>Your Rating:</strong>
+                <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                <Typography sx={{ marginBottom: "0.3rem" }}><strong>Your Rating:</strong></Typography>
                 {[1, 2, 3, 4, 5].map((value) => (
                   <IconButton
-                    key={value}
-                    onClick={() => handleRating(selectedMovie.id, value)}
-                    disabled={submitted[selectedMovie.id]}
-                    sx={{
-                      fontSize: "1.5 rem",
-                      p: 0.2,
-                      mb: 0.25, 
-                      minWidth: 0,
-                      color: value <= (selectedMovie.userRating || 0) ? "gold !important" : "gray",
-                      cursor: submitted[selectedMovie.id] ? "default" : "pointer",
-                    }}
-                  >
-                    <StarIcon fontSize="small" />
-                  </IconButton>
-                  
+                  key={value}
+                  onClick={() => handleRating(selectedMovie.id, value)}
+                  disabled={submitted[selectedMovie.id] && !isEditingRating}
+                  sx={{
+                    fontSize: "1.5 rem",
+                    p: 0.2,
+                    mb: 0.25, 
+                    minWidth: 0,
+                    color: value <= (selectedMovie.userRating || 0) ? "gold !important" : "gray",
+                    cursor: (submitted[selectedMovie.id] && !isEditingRating) ? "default" : "pointer",
+                  }}
+                >
+                  <StarIcon fontSize="small" />
+                </IconButton>
                 ))}
+                {submitted[selectedMovie.id] && !isEditingRating && (
+                  <Button 
+                    onClick={enableRatingEdit} 
+                    size="small" 
+                    variant="outlined" 
+                    sx={{ fontSize: "0.7rem", p: "2px 8px", ml: 1, height: "24px" }}
+                  >
+                    Edit Rating
+                  </Button>
+                )}
+              </Box>
+              {isEditingRating && (
+                <Typography variant="caption" color="primary" sx={{ display: 'block', mt: -1, mb: 1 }}>
+                  Click on a star to update your rating
                 </Typography>
-                {submitted[selectedMovie.id]}
+              )}
               </Box>
               <Typography variant="body1" sx={{ mb: 1 }}><strong>Year:</strong> {selectedMovie.year}</Typography>
               <Typography variant="body1" sx={{ mb: 1 }}><strong>Genre:</strong> {selectedMovie.genre}</Typography>
