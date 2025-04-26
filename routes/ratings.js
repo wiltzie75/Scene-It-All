@@ -5,7 +5,6 @@ const verifyToken = require("./verify");
 
 // POST /ratings
 router.post("/", verifyToken, async (req, res) => {
-    console.log('Request body:', req.body);  
     const { userId, movieId, score, review } = req.body;
   
     if (!userId || !movieId || !score) {

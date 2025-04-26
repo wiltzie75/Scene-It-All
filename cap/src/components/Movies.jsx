@@ -193,7 +193,7 @@ const Movies = () => {
 
   const handleRating = (movieId, score) => {
     const token = localStorage.getItem("token");
-    const user = JSON.parse(localStorage.getItem("user")); // <-- Add this line
+    const user = JSON.parse(localStorage.getItem("user"));
 
     if (!user?.id) {
       alert("User info not found.");
@@ -218,9 +218,19 @@ const Movies = () => {
         return res.json();
       })
       .then(() => {
-        setUserRatings((prev) => ({ ...prev, [movieId]: userRatings }));
+        setUserRatings((prev) => ({ ...prev, [movieId]: score }));
         setSubmitted((prev) => ({ ...prev, [movieId]: true }));
-        fetchMovies();
+        setMovies((prevMovies) =>
+          prevMovies.map((movie) =>
+            movie.id === movieId
+              ? { ...movie, userRating: score } // Update the rating of the movie
+              : movie
+          )
+        );
+        setSelectedMovie((prevMovie) => ({
+          ...prevMovie,
+          userRating: score,
+        }));
       })
       .catch((err) => {
         console.error("Error submitting rating:", err);
@@ -331,7 +341,7 @@ const Movies = () => {
                       p: 0.2,
                       mb: 0.25, 
                       minWidth: 0,
-                      color: value <= (userRatings[selectedMovie.id] || 0) ? "gold !important" : "gray",
+                      color: value <= (selectedMovie.userRating || 0) ? "gold !important" : "gray",
                       cursor: submitted[selectedMovie.id] ? "default" : "pointer",
                     }}
                   >
