@@ -45,6 +45,7 @@ const Login = ({token, setToken}) => {
         localStorage.setItem("token", data.token);
         localStorage.setItem("user", JSON.stringify(data.user));
         setToken(data.token);
+        console.log(data.token)
         navigate("/");
       } else {
         setError(data.message || "Login failed");

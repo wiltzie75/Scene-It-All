@@ -17,7 +17,7 @@ import Reviews from "./components/Reviews";
 
 function App() {
   const [count, setCount] = useState(0);
-  const [token, setToken] = useState(null);
+  const [token, setToken] = useState(() => localStorage.getItem("token") || null);
 
   let user = null;
   try {
