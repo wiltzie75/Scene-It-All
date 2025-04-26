@@ -11,6 +11,7 @@ const favoriteRoutes = require('./routes/favorite');
 // const recentReviewsRoutes = require('./routes/recentReviews');
 const topRatedRoutes = require('./routes/topRated');
 const profileRoutes = require('./routes/profile');
+const ratingsRoutes = require('./routes/ratings');
 app.use(cors({ origin: "*" }));
 require('dotenv').config();
 // set api
@@ -26,6 +27,7 @@ app.use('/api/comments',commentsRoutes);
 app.use('/api/favorite', favoriteRoutes);
 app.use('/api/profile', profileRoutes);
 app.use('/api/topRated', topRatedRoutes);
+app.use('/api/ratings', ratingsRoutes);
  
 // Set the server port and start the server
 const PORT = process.env.PORT || 3000;
