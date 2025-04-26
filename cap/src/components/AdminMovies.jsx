@@ -158,11 +158,15 @@ const AdminMovies = () => {
     }
   };
 
-  const indexOfLastItem = currentPage * itemsPerPage;
-  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-  const currentMovies = movies.slice(indexOfFirstItem, indexOfLastItem);
+  const filteredMovies = movies.filter((movie) =>
+    movie?.title?.toLowerCase().includes(searchTerm.toLowerCase())
+  );
 
-  const totalPages = Math.ceil(movies.length / itemsPerPage);
+  const indexOfLastMovie = currentPage * itemsPerPage;
+  const indexOfFirstMovie = indexOfLastMovie - itemsPerPage;
+  const currentMovies = filteredMovies.slice(indexOfFirstMovie, indexOfLastMovie);
+
+  const totalPages = Math.ceil(filteredMovies.length / itemsPerPage);
 
   return (
     <Box sx={{ maxWidth: 1200, margin: "0 auto", gap: 2, mt: 2, p: 2, display: "flex", flexDirection: "column" }}>
