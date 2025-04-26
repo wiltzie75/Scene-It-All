@@ -1,11 +1,14 @@
 import { useState, useEffect } from "react";
-import { TextField, Box, Typography, Card, CardMedia, CardContent, Dialog, DialogContent, DialogTitle, Button, Pagination } from "@mui/material";
+import { TextField, Box, Typography, IconButton, Card, CardMedia, CardContent, Dialog, DialogContent, DialogTitle, Button, Pagination } from "@mui/material";
+import StarIcon from "@mui/icons-material/Star";
 import "../App.css";
 import API from "../api/api";
 // import { hasCustomParams } from "react-admin";
 
 const Movies = () => {
   const [movies, setMovies] = useState([]);
+  const [userRatings, setUserRatings] = useState({});
+  const [submitted, setSubmitted] = useState({});
   const [selectedMovie, setSelectedMovie] = useState(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [addedToFavorite,setAddedToFavorite] = useState({});
@@ -20,21 +23,20 @@ const Movies = () => {
   const itemsPerPage = 10;
 
   useEffect(() => {
-
     const token = localStorage.getItem("token");
     setIsLoggedIn(!!token);
-
-    const fetchMovies = async () => {
-      try {
-        const response = await fetch(`${API}/movies`);
-        const data = await response.json();
-        setMovies(data);
-      } catch (error) {
-        console.error("Error fetching movies:", error);
-      }
-    };
     fetchMovies();
   }, []);
+
+  const fetchMovies = async () => {
+    try {
+      const response = await fetch(`${API}/movies`);
+      const data = await response.json();
+      setMovies(data);
+    } catch (error) {
+      console.error("Error fetching movies:", error);
+    }
+  };
 
   const handleReviewSubmit = async(movieId) => {
     const token = localStorage.getItem("token");
@@ -189,6 +191,43 @@ const Movies = () => {
     movie?.title?.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
+  const handleRating = (movieId, score) => {
+    const token = localStorage.getItem("token");
+    const user = JSON.parse(localStorage.getItem("user")); // <-- Add this line
+
+    if (!user?.id) {
+      alert("User info not found.");
+      return;
+    }
+
+    fetch(`${API}/ratings`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        ...(token && { Authorization: `Bearer ${token}` }),
+      },
+      body: JSON.stringify({ 
+        userId: user.id,
+        movieId,
+        score,
+        review: "" 
+       }),
+    })
+      .then((res) => {
+        if (!res.ok) throw new Error("Rating failed");
+        return res.json();
+      })
+      .then(() => {
+        setUserRatings((prev) => ({ ...prev, [movieId]: userRatings }));
+        setSubmitted((prev) => ({ ...prev, [movieId]: true }));
+        fetchMovies();
+      })
+      .catch((err) => {
+        console.error("Error submitting rating:", err);
+        alert("Something went wrong when submitting your rating.");
+      });
+  };
+
   const indexOfLastMovie = currentPage * itemsPerPage;
   const indexOfFirstMovie = indexOfLastMovie - itemsPerPage;
   const currentMovies = filteredMovies.slice(indexOfFirstMovie, indexOfLastMovie);
@@ -279,8 +318,30 @@ const Movies = () => {
 
             <Box sx={{ flex: 1}}>
               <Typography variant="body1" sx={{ mb: 1 }}><strong>Description:</strong> {selectedMovie.plot}</Typography>
-              <Typography variant="body1" sx={{ mb: 1 }}><strong>Rating:</strong> {selectedMovie.imdbRating}</Typography>
-              <Typography variant="body1" sx={{ mb: 1 }}><strong>My Rating:</strong> {selectedMovie.userRatings}</Typography>
+              <Typography variant="body1" sx={{ mb: 1 }}><strong>Imdb Rating:</strong> {selectedMovie.imdbRating}</Typography>
+              <Box>
+                <Typography sx={{ marginBottom: "0.3rem" }}><strong>Your Rating:</strong>
+                {[1, 2, 3, 4, 5].map((value) => (
+                  <IconButton
+                    key={value}
+                    onClick={() => handleRating(selectedMovie.id, value)}
+                    disabled={submitted[selectedMovie.id]}
+                    sx={{
+                      fontSize: "1.5 rem",
+                      p: 0.2,
+                      mb: 0.25, 
+                      minWidth: 0,
+                      color: value <= (userRatings[selectedMovie.id] || 0) ? "gold !important" : "gray",
+                      cursor: submitted[selectedMovie.id] ? "default" : "pointer",
+                    }}
+                  >
+                    <StarIcon fontSize="small" />
+                  </IconButton>
+                  
+                ))}
+                </Typography>
+                {submitted[selectedMovie.id]}
+              </Box>
               <Typography variant="body1" sx={{ mb: 1 }}><strong>Year:</strong> {selectedMovie.year}</Typography>
               <Typography variant="body1" sx={{ mb: 1 }}><strong>Genre:</strong> {selectedMovie.genre}</Typography>
             </Box>
@@ -348,7 +409,7 @@ const Movies = () => {
               <Typography variant="body1"><strong>Year:</strong> {selectedMovie.year}</Typography>
               <Typography variant="body1"><strong>Genre:</strong> {selectedMovie.genre}</Typography>
               {/* <Button onClick={() => handleAddToFavorite(selectedMovie.id)} sx={{ mt: 2,mr: 2 }} color="primary" variant="contained" disabled={!!addedToFavorite[selectedMovie.id]} > {addedToFavorite[selectedMovie.id] ? "Added to Favorite ✓" : "Add to Favorite"}</Button> */}
-              <Button onClick={() => handleReviewSubmit(selectedMovie.id)}>Add Review</Button>
+              {/* <Button onClick={() => handleReviewSubmit(selectedMovie.id)}>Add Review</Button> */}
 
               {isLoggedIn && (
                 <>
