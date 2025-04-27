@@ -33,6 +33,23 @@ router.get("/", verifyToken, async (req, res) => {
     }
 });
 
+// GET /ratings/user/:userId
+router.get("/user/:userId", verifyToken, async (req, res) => {
+    const { userId } = req.params;
+
+    try {
+        const userRatings = await prisma.userRating.findMany({
+            where: {
+                userId: parseInt(userId),
+            },
+        });
+
+        res.json(userRatings);
+    } catch (error) {
+        console.error("Error fetching user ratings:", error);
+        res.status(500).json({ message: "Server error." });
+    }
+});
 // POST /ratings
 router.post("/", verifyToken, async (req, res) => {
     const { userId, movieId, score, review } = req.body;
