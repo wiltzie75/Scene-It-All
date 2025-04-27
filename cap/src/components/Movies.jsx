@@ -29,13 +29,70 @@ const Movies = () => {
     fetchMovies();
   }, []);
 
+  useEffect(() => {
+    const fetchInitialData = async () => {
+      const token = localStorage.getItem("token");
+      const user = JSON.parse(localStorage.getItem("user"));
+      
+      // First fetch the movies
+      const fetchedMovies = await fetchMovies();
+      
+      // Then fetch user ratings if logged in
+      if (token && user?.id) {
+        const ratings = await fetchUserRatings(user.id, token);
+        
+        // Combine movies with ratings
+        const moviesWithRatings = fetchedMovies.map(movie => ({
+          ...movie,
+          userRating: ratings[movie.id] || 0
+        }));
+        
+        // Update movies with ratings applied
+        setMovies(moviesWithRatings);
+      }
+    };
+    
+    fetchInitialData();
+  }, []);
+
   const fetchMovies = async () => {
     try {
       const response = await fetch(`${API}/movies`);
       const data = await response.json();
       setMovies(data);
+      return data; // Return the fetched data
     } catch (error) {
       console.error("Error fetching movies:", error);
+      return [];
+    }
+  };
+
+  const fetchUserRatings = async (userId, token) => {
+    try {
+      const response = await fetch(`${API}/ratings/user/${userId}`, {
+        headers: {
+          "Authorization": `Bearer ${token}`
+        }
+      });
+      const data = await response.json();
+      const ratingsMap = data.reduce((acc, rating) => {
+        acc[rating.movieId] = rating.score;
+        return acc;
+      }, {});
+      
+      setUserRatings(ratingsMap);
+      
+      // Also mark these as submitted
+      const submittedMap = {};
+      data.forEach(rating => {
+        submittedMap[rating.movieId] = true;
+      });
+      setSubmitted(submittedMap);
+      
+      return ratingsMap;
+    } catch (error) {
+      console.error("Error fetching user ratings:", error);
+      return {};
     }
   };
 
@@ -220,7 +277,6 @@ const Movies = () => {
       })
       .then(() => {
         setUserRatings((prev) => ({ ...prev, [movieId]: score }));
-        setSubmitted((prev) => ({ ...prev, [movieId]: true }));
         setMovies((prevMovies) =>
           prevMovies.map((movie) =>
             movie.id === movieId
@@ -228,6 +284,7 @@ const Movies = () => {
               : movie
           )
         );
+        setSubmitted((prev) => ({ ...prev, [movieId]: true }));
         setSelectedMovie((prevMovie) => ({
           ...prevMovie,
           userRating: score,
