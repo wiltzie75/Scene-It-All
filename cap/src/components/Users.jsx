@@ -1,5 +1,16 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import {
+  Box,
+  Typography,
+  Button,
+  Paper,
+  List,
+  ListItem,
+  ListItemText,
+  Divider,
+  Stack
+} from "@mui/material";
 import API from "../api/api";
 
 const Users = () => {
@@ -92,30 +103,45 @@ const Users = () => {
     }
 
     return ( 
-        <>
-            {/* For Admin users, this will display a list of users, their review counts and Admin status */}
-            <div style={{ border: '1px solid black' }}>
-                {!profile.isAdmin ? (
-                    <div>
-                        <h3>YOU MUST BE AN ADMIN TO VIEW THIS PAGE</h3>
-                    </div>
-                ) : (
-                    <div>
-                        <h2>Admin Panel</h2>
-                        <ul>
-                            {users && users.map((user) => (
-                                <li key={user.id}>
-                                    {user.firstName} {user.lastName} | {user.email} | Reviews: {user.reviews?.length || 0} | Admin: {user.isAdmin ? "Yes" : "No"}{" "}
-                                    <button onClick={() => handleAdminToggle(user.id, user.isAdmin)}>
-                                        {user.isAdmin ? "Revoke Admin" : "Make Admin"}
-                                    </button>
-                                </li>
-                            ))}
-                        </ul>
-                    </div>
-                )}
-            </div>
-        </>
+        <Box sx={{ maxWidth: 1000, mx: "auto", mt: 4, p: 2 }}>
+      {!profile.isAdmin ? (
+        <Paper elevation={3} sx={{ p: 4, textAlign: "center" }}>
+          <Typography variant="h5" color="error">
+            YOU MUST BE AN ADMIN TO VIEW THIS PAGE
+          </Typography>
+        </Paper>
+      ) : (
+        <Paper elevation={3} sx={{ p: 4 }}>
+          <Typography variant="h4" mb={3}>
+            Admin Panel
+          </Typography>
+
+          <List>
+            {users && users.map((user) => (
+              <Box key={user.id}>
+                <ListItem
+                  secondaryAction={
+                    <Button
+                      variant="outlined"
+                      color={user.isAdmin ? "error" : "primary"}
+                      onClick={() => handleAdminToggle(user.id, user.isAdmin)}
+                    >
+                      {user.isAdmin ? "Revoke Admin" : "Make Admin"}
+                    </Button>
+                  }
+                >
+                  <ListItemText
+                    primary={`${user.firstName} ${user.lastName} (${user.email})`}
+                    secondary={`Reviews: ${user.reviews?.length || 0} | Admin: ${user.isAdmin ? "Yes" : "No"}`}
+                  />
+                </ListItem>
+                <Divider />
+              </Box>
+            ))}
+          </List>
+        </Paper>
+      )}
+    </Box>
     );
 }
  
