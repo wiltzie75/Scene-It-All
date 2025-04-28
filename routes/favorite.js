@@ -52,22 +52,21 @@ router.post('/',verifyToken, async(req, res) => {
 });
 
 // delete item from favorite
-router.delete('/:userId/:movieId', async(req, res) => {
-    const { userId, movieId } = req.params;
-    try{
-        await prisma.favorite.delete({
-            where: { 
-                userId_movieId: {
-                    userId: Number(userId),
-                    movieId: Number(movieId),
-                }
-            }
-        });
-        res.json({message: `Movie ${movieId} removed from favorite.`});
+router.delete('/:movieId', verifyToken, async (req, res) => {
+    const userId = req.user.id;
+    const movieId = req.params.movieId;
+  
+    try {
+      await prisma.favorite.deleteMany({
+        where: {
+          userId: Number(userId),
+          movieId: Number(movieId),
+        },
+      });
+      res.json({ message: `Movie ${movieId} removed from favorite.` });
     } catch (error) {
-        console.log(error);
-        res.status(500).json({message:'Server error'})
+      console.error(error);
+      res.status(500).json({ message: 'Server error' });
     }
-})
-
+  });
 module.exports = router;

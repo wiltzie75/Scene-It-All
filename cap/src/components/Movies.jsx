@@ -384,17 +384,26 @@ const Movies = () => {
           <>
             <DialogContent>
             <Box sx={{ display: "flex", flexDirection: { xs: "column", sm: "row" }, gap: 3 }}>
-            <Card key={selectedMovie.id} sx={{ cursor: "pointer", maxHeight: 220, maxWidth: 160 }}>
-            <CardMedia
-              component="img"
-              image={selectedMovie.poster}
-              alt={selectedMovie.title}
-              sx={{ height: "auto", width: "100%" }}
-            />
-              <CardContent sx={{ p: 1 }}>
+              {/* Replace the existing Card with this */}
+              <Box sx={{ width: 160, flexShrink: 0 }}>
+                <img
+                  src={selectedMovie.poster}
+                  alt={selectedMovie.title}
+                  style={{
+                    width: '100%',
+                    height: 'auto',
+                    maxHeight: 220,
+                    objectFit: 'contain',
+                    display: 'block'
+                  }}
+                />
+                <Typography variant="body2" sx={{ mt: 1 }}>{selectedMovie.title}</Typography>
+              </Box>
+
+              <Box sx={{ flex: 1 }}>
                 <Typography variant="body2" noWrap>{selectedMovie.title}</Typography>
-              </CardContent>
-            </Card>
+              </Box>
+            </Box>
 
             <Box sx={{ flex: 1}}>
               <Typography variant="body1" sx={{ mb: 1 }}><strong>Description:</strong> {selectedMovie.plot}</Typography>
@@ -438,7 +447,6 @@ const Movies = () => {
               </Box>
               <Typography variant="body1" sx={{ mb: 1 }}><strong>Year:</strong> {selectedMovie.year}</Typography>
               <Typography variant="body1" sx={{ mb: 1 }}><strong>Genre:</strong> {selectedMovie.genre}</Typography>
-            </Box>
             </Box>
             <br></br>
             <Typography variant="body1"><strong>Reviews:</strong></Typography>

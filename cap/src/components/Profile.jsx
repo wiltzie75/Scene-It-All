@@ -109,7 +109,6 @@ const Profile = (props) => {
                     "Content-Type": "application/json",
                     "Authorization": `Bearer ${token}`,
                 },
-                body: JSON.stringify({ movieId }), 
             });
 
             if (response.ok) {
@@ -144,18 +143,18 @@ const Profile = (props) => {
                 ) : (
                     <div>
                         <h3>My Favorites</h3>
-                        {profile.favorites?.map((movie) => (
-                            <div key={movie.id}>
-                                <img src={movie.poster} alt={movie.title} />
-                                <h4>{movie.title}</h4>
-                                <p>Ratings: {movie.imdbRating}</p>
-                                <button
-                                     onClick={()=> handleRemoveFromFavorite(movie.id)}
-                                     style={{ backgroundColor: "red", color: "white", border: "none", padding: "5px 10px", cursor: "pointer" }}
-                                     >
-                                        Remove from Favorite
-                                     </button>
-                            </div>
+                        {profile.favorites?.map((favorite) => (
+                            <div key={favorite.id}>
+                            <img src={favorite.movie?.poster} alt={favorite.movie?.title || "No title"} />
+                            <h4>{favorite.movie?.title || "No Title Available"}</h4>
+                            <p>Ratings: {favorite.movie?.userRatings || "N/A"}</p>
+                            <button
+                              onClick={() => handleRemoveFromFavorite(favorite.movieId)}
+                              style={{ backgroundColor: "red", color: "white", border: "none", padding: "5px 10px", cursor: "pointer" }}
+                            >
+                              Remove from Favorite
+                            </button>
+                          </div>
                                 
                         ))}
                     </div>
