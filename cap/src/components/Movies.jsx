@@ -33,21 +33,16 @@ const Movies = () => {
     const fetchInitialData = async () => {
       const token = localStorage.getItem("token");
       const user = JSON.parse(localStorage.getItem("user"));
-      
-      // First fetch the movies
       const fetchedMovies = await fetchMovies();
       
-      // Then fetch user ratings if logged in
       if (token && user?.id) {
         const ratings = await fetchUserRatings(user.id, token);
         
-        // Combine movies with ratings
         const moviesWithRatings = fetchedMovies.map(movie => ({
           ...movie,
           userRating: ratings[movie.id] || 0
         }));
         
-        // Update movies with ratings applied
         setMovies(moviesWithRatings);
       }
     };
@@ -181,6 +176,7 @@ const Movies = () => {
     }
     setIsCommentDialogOpen(false);
     setActiveReviewId(null);
+    fetchMovies();
 };
 
   const renderComments = (review) => {
