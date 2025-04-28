@@ -143,8 +143,9 @@ const Movies = () => {
   };
 
   // add to favorite
-  const handleAddToFavorite = async(userId, movieId) =>{
+  const handleAddToFavorite = async(movieId) =>{
     const token = localStorage.getItem("token");
+    const user = JSON.parse(localStorage.getItem("user")); 
     if(!token){
       setShowLoginDialog(true);
       return;
@@ -156,7 +157,7 @@ const Movies = () => {
           "Content-Type": "application/json",
           "Authorization": `Bearer ${token}`,
         },
-        body: JSON.stringify({userId,movieId}),
+        body: JSON.stringify({userId: user.id, movieId: movieId}),
         
       });
 

@@ -3,6 +3,7 @@ const router = express.Router();
 const prisma = require("../prisma");
 // get all movies
 router.get("/", async (req, res) => {
+  console.log(req.body);
   try {
     const movies = await prisma.movie.findMany({
       include: {
@@ -30,7 +31,7 @@ router.get("/", async (req, res) => {
         },
         userRatings: true,
         favorites: true,
-        // watchlist: true, 
+        watchlist: true, 
       }
     });
     res.json(movies);
@@ -72,7 +73,7 @@ router.get("/:id", async (req, res) => {
         },
         userRatings: true,
         favorites: true,
-        watchlist: true,
+        // watchlist: true,
       },
     });
 

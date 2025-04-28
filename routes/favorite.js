@@ -23,28 +23,40 @@ router.get('/:id/favorite', async(req, res) => {
 // add item to favorite
 router.post('/',verifyToken, async(req, res) => {
     const { userId, movieId } = req.body;
-    console.log(req.user);
+    console.log('*******', req.user);
+    console.log(req.body)
+
     try{
-    
         const user = await prisma.user.findUnique({ where: { id: userId } });
-    if (!user) {
-      return res.status(404).json({ error: `User with ID ${userId} not found.` });
-    }
+     
+        if (!user) {
+            return res.status(404).json({ error: `User with ID ${userId} not found.` });
+        }
 
+        const movie = await prisma.movie.findUnique({ where: { id: movieId } });
+        if (!movie) {
+            return res.status(404).json({ error: `Movie with ID ${movieId} not found.` });
+        }
+        console.log('###', userId)
+        const userExists = await prisma.user.findUnique({
+            where: { id: parseInt(userId) }
+        });
+        
+        const movieExists = await prisma.movie.findUnique({
+            where: { id: parseInt(movieId) }
+        });
+        
+        if (!userExists || !movieExists) {
+            return res.status(404).json({ message: "User or Movie not found" });
+        }
 
-    const movie = await prisma.movie.findUnique({ where: { id: movieId } });
-    if (!movie) {
-      return res.status(404).json({ error: `Movie with ID ${movieId} not found.` });
-    }
-
-    const addFavorite = await prisma.favorite.create({
-        data: {
-            userId: Number(userId),
-            movieId: Number(movieId),
-        },
-    });
-
-    res.status(201).json(addFavorite);
+        const addFavorite = await prisma.favorite.create({
+            data: {
+                userId: parseInt(userId),
+                movieId: parseInt(movieId),
+            },
+        });
+        res.status(201).json(addFavorite);
     } catch (error) {
         console.log(error);
         res.status(500).json({message:'Server error'})
