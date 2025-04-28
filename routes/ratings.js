@@ -50,6 +50,7 @@ router.get("/user/:userId", verifyToken, async (req, res) => {
         res.status(500).json({ message: "Server error." });
     }
 });
+
 // POST /ratings
 router.post("/", verifyToken, async (req, res) => {
     const { userId, movieId, score, review } = req.body;
