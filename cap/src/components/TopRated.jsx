@@ -164,7 +164,6 @@ const TopRated = () => {
           <Box
             key={movie.id}
             sx={{
-              border: "1px solid #ccc",
               borderRadius: "8px",
               padding: "16px",
               backgroundColor: "#8D99AE",
@@ -192,6 +191,7 @@ const TopRated = () => {
               sx={{ height: "auto", width: "100%" }}
             />
             </Card>
+            <br></br>
             <Typography>
               <strong>Average Rating: </strong>{movie.imdbRating}
             </Typography>
