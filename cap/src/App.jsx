@@ -17,7 +17,7 @@ import Reviews from "./components/Reviews";
 
 function App() {
   const [count, setCount] = useState(0);
-  const [token, setToken] = useState(null);
+  const [token, setToken] = useState(() => localStorage.getItem("token") || null);
 
   let user = null;
   try {
@@ -46,8 +46,10 @@ function App() {
               <button>Go to Admin Page</button>
             </Link>
           </div>
-        )} */}
 
+        )}  */}
+
+       
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/movies" element={<Movies />} />
@@ -66,7 +68,7 @@ function App() {
           <Route path="/mycomments" element={<MyComments />} />
           <Route path="/users" element={<Users />} />
 
-          {/*  Only show the admin page if the user is an admin  */}
+          /*  Only show the admin page if the user is an admin 
           <Route
             path="/admin"
             element={user?.isAdmin ? <AdminMovies /> : <Navigate to="/" />}
@@ -74,7 +76,7 @@ function App() {
         </Routes>
       </Container>
 
-      {/* <Footer /> */}
+      {/* /* <Footer /> */}
     </Box>
   );
 }

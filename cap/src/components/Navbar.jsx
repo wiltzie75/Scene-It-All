@@ -37,7 +37,7 @@ export default function Navbar({ token, setToken }) {
           <Button color="inherit" component={Link} to="/movies">
             Movies
           </Button>
-          <Button color="inherit" component={Link} to="/top-rated">
+          <Button color="inherit" component={Link} to="/topRated">
             Top Rated
           </Button>
 

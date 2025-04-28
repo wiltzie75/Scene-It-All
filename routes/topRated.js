@@ -1,18 +1,16 @@
 const express = require("express");
 const router = express.Router();
 const prisma = require("../prisma");
+const verifyToken = require("./verify");
 
 router.get("/", async (req, res) => {
   try {
     const topRated = await prisma.movie.findMany({
       where: {
-        reviews: {
-          some: {
-            rating: {
-              not: null,
-            },
-          },
-        },
+        OR: [
+          { reviews: { some: { rating: { not: null } } } },
+          { userRatings: { some: { score: { not: null } } } },
+        ],
       },
       select: {
         id: true,
@@ -23,21 +21,30 @@ router.get("/", async (req, res) => {
             rating: true,
           },
         },
+        userRatings: {
+          select: {
+            score: true,
+          },
+        },
       },
     });
 
     const result = topRated
       .map((movie) => {
-        const ratings = movie.reviews.map((r) => r.rating);
-        const average = ratings.length
-          ? ratings.reduce((a, b) => a + b, 0) / ratings.length
+        const reviewRatings = movie.reviews.map((r) => r.rating);
+        const userRatings = movie.userRatings.map((r) => r.score);
+        const allRatings = [...reviewRatings, ...userRatings];
+
+        const average = allRatings.length
+          ? allRatings.reduce((a, b) => a + b, 0) / allRatings.length
           : 0;
+
         return {
           id: movie.id,
           title: movie.title,
           imageUrl: movie.imageUrl,
           rating: parseFloat(average.toFixed(2)),
-          reviewCount: ratings.length,
+          reviewCount: allRatings.length,
         };
       })
       .sort((a, b) => b.rating - a.rating)
@@ -50,33 +57,55 @@ router.get("/", async (req, res) => {
   }
 });
 
-router.post("/", async (req, res) => {
-  const { movieId, rating } = req.body;
+// POST /ratings
+router.post("/", verifyToken, async (req, res) => {
+  const { userId, movieId, score, review } = req.body;
 
-  // temporary hardcoded values
-  const userId = 1; // replace with actual userId from token later
-  const subject = "Rated via TopRated";
-  const description = "This is an auto-generated review from TopRated.jsx";
-
-  if (!movieId || !rating) {
-    return res.status(400).json({ error: "Missing movieId or rating" });
+  if (!userId || !movieId || !score) {
+    return res.status(400).json({ message: "Missing required fields." });
   }
 
   try {
-    const newReview = await prisma.review.create({
-      data: {
-        movieId,
-        userId,
-        rating: parseFloat(rating),
-        subject,
-        description,
+    // Check if the user has already rated the movie
+    const existingRating = await prisma.userRating.findUnique({
+      where: {
+        userId_movieId: {
+          userId: parseInt(userId),
+                  movieId: parseInt(movieId),
+        },
       },
     });
 
-    res.status(201).json({ message: "Rating submitted", review: newReview });
+    if (existingRating) {
+      // If rating exists, update it
+      const updatedRating = await prisma.userRating.update({
+        where: {
+          userId_movieId: {
+              userId: parseInt(userId),
+              movieId: parseInt(movieId),
+          },
+        },
+        data: {
+          score,
+          review,
+        },
+      });
+      return res.json({ message: "Rating updated", updatedRating });
+    } else {
+      // If no rating exists, create a new one
+      const newRating = await prisma.userRating.create({
+        data: {
+          userId: parseInt(userId),
+                  movieId: parseInt(movieId),
+          score,
+          review,
+        },
+      });
+      return res.json({ message: "New rating created", newRating });
+    }
   } catch (error) {
-    console.error("Error submitting rating:", error);
-    res.status(500).json({ error: "Server error while submitting rating" });
+    console.error("Error handling rating:", error);
+    res.status(500).json({ message: "Server error." });
   }
 });
 

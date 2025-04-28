@@ -1,11 +1,13 @@
 import { useState, useEffect } from "react";
-import { TextField, Box, Typography, Card, CardMedia, CardContent, Dialog, DialogContent, DialogTitle, Button, Pagination } from "@mui/material";
+import { TextField, Box, Typography, IconButton, Card, CardMedia, CardContent, Dialog, DialogContent, DialogTitle, Button, Pagination } from "@mui/material";
+import StarIcon from "@mui/icons-material/Star";
 import "../App.css";
 import API from "../api/api";
-// import { hasCustomParams } from "react-admin";
 
 const Movies = () => {
   const [movies, setMovies] = useState([]);
+  const [userRatings, setUserRatings] = useState({});
+  const [submitted, setSubmitted] = useState({});
   const [selectedMovie, setSelectedMovie] = useState(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [addedToFavorite,setAddedToFavorite] = useState({});
@@ -17,24 +19,75 @@ const Movies = () => {
   const [activeReviewId, setActiveReviewId] = useState(null);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
+  const [isEditingRating, setIsEditingRating] = useState(false);
   const itemsPerPage = 10;
 
   useEffect(() => {
-
     const token = localStorage.getItem("token");
     setIsLoggedIn(!!token);
-
-    const fetchMovies = async () => {
-      try {
-        const response = await fetch(`${API}/movies`);
-        const data = await response.json();
-        setMovies(data);
-      } catch (error) {
-        console.error("Error fetching movies:", error);
-      }
-    };
     fetchMovies();
   }, []);
+
+  useEffect(() => {
+    const fetchInitialData = async () => {
+      const token = localStorage.getItem("token");
+      const user = JSON.parse(localStorage.getItem("user"));
+      const fetchedMovies = await fetchMovies();
+      
+      if (token && user?.id) {
+        const ratings = await fetchUserRatings(user.id, token);
+        
+        const moviesWithRatings = fetchedMovies.map(movie => ({
+          ...movie,
+          userRating: ratings[movie.id] || 0
+        }));
+        
+        setMovies(moviesWithRatings);
+      }
+    };
+    
+    fetchInitialData();
+  }, []);
+
+  const fetchMovies = async () => {
+    try {
+      const response = await fetch(`${API}/movies`);
+      const data = await response.json();
+      setMovies(data);
+      return data;
+    } catch (error) {
+      console.error("Error fetching movies:", error);
+      return [];
+    }
+  };
+
+  const fetchUserRatings = async (userId, token) => {
+    try {
+      const response = await fetch(`${API}/ratings/user/${userId}`, {
+        headers: {
+          "Authorization": `Bearer ${token}`
+        }
+      });
+      const data = await response.json();
+      const ratingsMap = data.reduce((acc, rating) => {
+        acc[rating.movieId] = rating.score;
+        return acc;
+      }, {});
+      
+      setUserRatings(ratingsMap);
+      
+      const submittedMap = {};
+      data.forEach(rating => {
+        submittedMap[rating.movieId] = true;
+      });
+      setSubmitted(submittedMap);
+      
+      return ratingsMap;
+    } catch (error) {
+      console.error("Error fetching user ratings:", error);
+      return {};
+    }
+  };
 
   const handleReviewSubmit = async(movieId) => {
     const token = localStorage.getItem("token");
@@ -43,12 +96,17 @@ const Movies = () => {
       return;
     }
 
-    const user = JSON.parse(localStorage.getItem("user")); // or however you store user info
+    const user = JSON.parse(localStorage.getItem("user"));
     if (!user?.id) {
       alert("User info not found.");
       return;
     }
-
+    
+    if (submitted[movieId]) {
+      alert("You can only submit one review.");
+      return;
+    }
+    
     try {
       const response = await fetch(`${API}/reviews`, {
         method: "POST",
@@ -70,14 +128,17 @@ const Movies = () => {
       if (response.ok) {
         alert("Review added");
         setAddReview({ subject: "", description: "" });
+        setSubmitted((prev) => ({ ...prev, [movieId]: true })); 
       } else {
         alert(data.message || "Failed to add Review");
       }
+
 
     } catch (error) {
       console.error("Error adding Review", error);
     }
     setIsReviewDialogOpen(false);
+    fetchMovies();
   };
 
   const handleCommentSubmit = async (reviewId) => {
@@ -88,7 +149,7 @@ const Movies = () => {
           return;
         }
     
-        const user = JSON.parse(localStorage.getItem("user")); // or however you store user info
+        const user = JSON.parse(localStorage.getItem("user"));
         if (!user?.id) {
           alert("User info not found.");
           return;
@@ -121,6 +182,7 @@ const Movies = () => {
     }
     setIsCommentDialogOpen(false);
     setActiveReviewId(null);
+    fetchMovies();
 };
 
   const renderComments = (review) => {
@@ -190,6 +252,57 @@ const Movies = () => {
     movie?.title?.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
+  const handleRating = (movieId, score) => {
+    const token = localStorage.getItem("token");
+    const user = JSON.parse(localStorage.getItem("user"));
+
+    if (!user?.id) {
+      alert("User info not found.");
+      return;
+    }
+
+    fetch(`${API}/ratings`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        ...(token && { Authorization: `Bearer ${token}` }),
+      },
+      body: JSON.stringify({ 
+        userId: user.id,
+        movieId,
+        score,
+        review: "" 
+       }),
+    })
+      .then((res) => {
+        if (!res.ok) throw new Error("Rating failed");
+        return res.json();
+      })
+      .then(() => {
+        setUserRatings((prev) => ({ ...prev, [movieId]: score }));
+        setMovies((prevMovies) =>
+          prevMovies.map((movie) =>
+            movie.id === movieId
+              ? { ...movie, userRating: score }
+              : movie
+          )
+        );
+        setSubmitted((prev) => ({ ...prev, [movieId]: true }));
+        setSelectedMovie((prevMovie) => ({
+          ...prevMovie,
+          userRating: score,
+        }));
+      })
+      .catch((err) => {
+        console.error("Error submitting rating:", err);
+        alert("Something went wrong when submitting your rating.");
+      });
+  };
+
+  const enableRatingEdit = () => {
+    setIsEditingRating(true);
+  };
+
   const indexOfLastMovie = currentPage * itemsPerPage;
   const indexOfFirstMovie = indexOfLastMovie - itemsPerPage;
   const currentMovies = filteredMovies.slice(indexOfFirstMovie, indexOfLastMovie);
@@ -236,9 +349,6 @@ const Movies = () => {
           currentMovies.map((movie) => (
             <Card key={movie.id} onClick={() => setSelectedMovie(movie)} sx={{ cursor: "pointer", bgcolor: "#fff", transition: "0.3s", "&:hover": { bgcolor: "#f0f0f0" } }}>
               <CardMedia component="img" height="325" image={movie.poster} alt={movie.title} />
-              {/* <CardContent>
-                <Typography variant="h6" sx={{fontSize: ".75rem"}}  >{movie.title}</Typography>
-              </CardContent> */}
             </Card>
           ))
         ) : (
@@ -280,8 +390,44 @@ const Movies = () => {
 
             <Box sx={{ flex: 1}}>
               <Typography variant="body1" sx={{ mb: 1 }}><strong>Description:</strong> {selectedMovie.plot}</Typography>
-              <Typography variant="body1" sx={{ mb: 1 }}><strong>Rating:</strong> {selectedMovie.imdbRating}</Typography>
-              <Typography variant="body1" sx={{ mb: 1 }}><strong>My Rating:</strong> {selectedMovie.userRatings}</Typography>
+              <Typography variant="body1" sx={{ mb: 1 }}><strong>Imdb Rating:</strong> {selectedMovie.imdbRating}</Typography>
+              <Box>
+                <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                <Typography sx={{ marginBottom: "0.3rem" }}><strong>Your Rating:</strong></Typography>
+                {[1, 2, 3, 4, 5].map((value) => (
+                  <IconButton
+                  key={value}
+                  onClick={() => handleRating(selectedMovie.id, value)}
+                  disabled={submitted[selectedMovie.id] && !isEditingRating}
+                  sx={{
+                    fontSize: "1.5 rem",
+                    p: 0.2,
+                    mb: 0.25, 
+                    minWidth: 0,
+                    color: value <= (selectedMovie.userRating || 0) ? "gold !important" : "gray",
+                    cursor: (submitted[selectedMovie.id] && !isEditingRating) ? "default" : "pointer",
+                  }}
+                >
+                  <StarIcon fontSize="small" />
+                </IconButton>
+                ))}
+                {submitted[selectedMovie.id] && !isEditingRating && (
+                  <Button 
+                    onClick={enableRatingEdit} 
+                    size="small" 
+                    variant="outlined" 
+                    sx={{ fontSize: "0.7rem", p: "2px 8px", ml: 1, height: "24px" }}
+                  >
+                    Edit Rating
+                  </Button>
+                )}
+              </Box>
+              {isEditingRating && (
+                <Typography variant="caption" color="primary" sx={{ display: 'block', mt: -1, mb: 1 }}>
+                  Click on a star to update your rating
+                </Typography>
+              )}
+              </Box>
               <Typography variant="body1" sx={{ mb: 1 }}><strong>Year:</strong> {selectedMovie.year}</Typography>
               <Typography variant="body1" sx={{ mb: 1 }}><strong>Genre:</strong> {selectedMovie.genre}</Typography>
             </Box>
@@ -349,7 +495,7 @@ const Movies = () => {
               <Typography variant="body1"><strong>Year:</strong> {selectedMovie.year}</Typography>
               <Typography variant="body1"><strong>Genre:</strong> {selectedMovie.genre}</Typography>
               {/* <Button onClick={() => handleAddToFavorite(selectedMovie.id)} sx={{ mt: 2,mr: 2 }} color="primary" variant="contained" disabled={!!addedToFavorite[selectedMovie.id]} > {addedToFavorite[selectedMovie.id] ? "Added to Favorite ✓" : "Add to Favorite"}</Button> */}
-              <Button onClick={() => handleReviewSubmit(selectedMovie.id)}>Add Review</Button>
+              {/* <Button onClick={() => handleReviewSubmit(selectedMovie.id)}>Add Review</Button> */}
 
               {isLoggedIn && (
                 <>
