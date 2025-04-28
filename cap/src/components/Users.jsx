@@ -103,7 +103,7 @@ const Users = () => {
     }
 
     return ( 
-        <Box sx={{ maxWidth: 1000, mx: "auto", mt: 4, p: 2 }}>
+      <Box sx={{ maxWidth: 1000, mx: "auto", mt: 4, p: 2, bgcolor: "#2B2D42" }}>
       {!profile.isAdmin ? (
         <Paper elevation={3} sx={{ p: 4, textAlign: "center" }}>
           <Typography variant="h5" color="error">
