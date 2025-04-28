@@ -31,7 +31,7 @@ router.get("/", async (req, res) => {
         },
         userRatings: true,
         favorites: true,
-        watchlist: true, 
+        // watchlist: true, 
       }
     });
     res.json(movies);
