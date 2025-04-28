@@ -316,7 +316,7 @@ const AdminMovies = () => {
       
       {/* Pagination */}
         {totalPages > 1 && (
-        <Box sx={{ mt: 1, display: "flex", justifyContent: "center" }}>
+        <Box sx={{ mt: 1, display: "flex", justifyContent: "center", color: "#EDF2F4" }}>
           <Pagination
             count={totalPages}
             page={currentPage}
@@ -324,6 +324,14 @@ const AdminMovies = () => {
             color="primary"
             shape="rounded"
             size="small"
+            sx={{
+              "& .MuiPaginationItem-root": {
+                color: "#EDF2F4", // Change the text color of the pagination buttons to white
+              },
+              "& .MuiPaginationItem-ellipsis": {
+                color: "#EDF2F4", // Change the ellipsis color to white (if any)
+              },
+            }}
           />
         </Box>
       )}
