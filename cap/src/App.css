@@ -16,7 +16,7 @@ html, body {
   width: 100vw;
   height: 100vh;
   /* overflow: hidden; */
-  background-color: #2B2D42 /* Optional: solid background */
+  background-color: #2B2D42 !important/* Optional: solid background */
 }
 
 .logo {
