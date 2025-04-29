@@ -77,8 +77,8 @@ router.delete('/:userId/:favoriteId', async(req, res) => {
     try {
         const favorite = await prisma.favorite.findUnique({
             where: {
-                id: parseInt(favoriteId),
-                userId: parseInt(userId)
+                id: favoriteId,
+                userId:parseInt(userId)
                 // userId_movieId: {
                     // userId: Number(userId),
                 //     movieId: movieId,
