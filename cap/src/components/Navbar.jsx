@@ -33,19 +33,6 @@ export default function Navbar({ token, setToken }) {
       }}
     >
       <Toolbar>
-        <Typography 
-          variant="h5" 
-          sx={{
-            flex: 1,
-            fontFamily: "Montserrat, sans-serif", 
-            cursor: "pointer",
-            "&:hover": { color: "#FFF176" },
-          }}
-          onClick={() => navigate("/")} 
-        >
-          Scene It All
-        </Typography>
-
         {/* Navigation buttons */}
         <Button
           sx={{
@@ -99,7 +86,7 @@ export default function Navbar({ token, setToken }) {
           Top Rated
         </Button>
 
-        <Box sx={{ ml: 2 }}>
+        
           {token ? (
             <>
               <Button
@@ -243,7 +230,7 @@ export default function Navbar({ token, setToken }) {
               </Button>
             </>
           )}
-        </Box>
+        
       </Toolbar>
     </AppBar>
   );
