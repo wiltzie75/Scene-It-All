@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import API from "../api/api";
 // import { favorite } from "../../../prisma";
+// import { favorite } from "../../../prisma";
 // import { BottomNavigation } from "@mui/material";
 // import { border } from "@mui/system";
 
@@ -103,26 +104,33 @@ const Profile = (props) => {
         const userId = profile.id;
 
         try {
-            const response = await fetch(`${API}/favorite/${movieId}`, {
+            const response = await fetch(`${API}/favorite/${userId}/${movieId}`, {
                 method: "DELETE",
                 headers: {
                     "Content-Type": "application/json",
                     "Authorization": `Bearer ${token}`,
                 },
-                body: JSON.stringify({ movieId }), 
+                // body: JSON.stringify({ movieId }), 
             });
 
             if (response.ok) {
+                 // update favorites data 
+            setProfile((prevProfile) => ({
+                ...prevProfile,
+                favorites: prevProfile.favorites.filter(movie => movie.id !== movieId),
+            }));
                 alert("Movie removed from Favorite!");
-                getProfile(); 
+                // getProfile(); 
             } else {
-                alert("Failed to remove movie from Favorite");
+                const errorData = await response.json();
+                alert(`Failed to remove movie from Favorite: ${errorData.message || 'Unknown error'}`);
             }
         } catch (error) {
             console.error("Error removing movie from Favorite:", error);
+            alert("An error occurred while removing the movie from Favorite.");
         }
     };
-
+  console.log(profile?.favorites);
 
     return ( 
         <>
@@ -146,9 +154,9 @@ const Profile = (props) => {
                         <h3>My Favorites</h3>
                         {profile.favorites?.map((movie) => (
                             <div key={movie.id}>
-                                <img src={movie.poster} alt={movie.title} />
-                                <h4>{movie.title}</h4>
-                                <p>Ratings: {movie.imdbRating}</p>
+                                <img src={movie.movie.poster} alt={movie.movie.title} />
+                                <h4>{movie.movie.title}</h4>
+                                <p>Ratings: {movie.movie.imdbRating}</p>
                                 <button
                                      onClick={()=> handleRemoveFromFavorite(movie.id)}
                                      style={{ backgroundColor: "red", color: "white", border: "none", padding: "5px 10px", cursor: "pointer" }}

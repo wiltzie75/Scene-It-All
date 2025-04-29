@@ -102,10 +102,10 @@ const Movies = () => {
       return;
     }
     
-    if (submitted[movieId]) {
-      alert("You can only submit one review.");
-      return;
-    }
+    // if (submitted[movieId]) {
+    //   alert("You can only submit one review.");
+    //   return;
+    // }
     
     try {
       const response = await fetch(`${API}/reviews`, {
@@ -382,7 +382,7 @@ const Movies = () => {
       <Dialog open={!!selectedMovie} onClose={() => setSelectedMovie(null)} maxWidth="md" fullWidth>
         {selectedMovie && (
           <>
-            <DialogContent>
+            <DialogContent sx={{backgroundColor: "#EDF2F4"}}>
             <Box sx={{ display: "flex", flexDirection: { xs: "column", sm: "row" }, gap: 3 }}>
             <Card key={selectedMovie.id} sx={{ cursor: "pointer", maxHeight: 220, maxWidth: 160 }}>
             <CardMedia
@@ -502,8 +502,6 @@ const Movies = () => {
               )}
               <Typography variant="body1"><strong>Year:</strong> {selectedMovie.year}</Typography>
               <Typography variant="body1"><strong>Genre:</strong> {selectedMovie.genre}</Typography>
-              {/* <Button onClick={() => handleAddToFavorite(selectedMovie.id)} sx={{ mt: 2,mr: 2 }} color="primary" variant="contained" disabled={!!addedToFavorite[selectedMovie.id]} > {addedToFavorite[selectedMovie.id] ? "Added to Favorite ✓" : "Add to Favorite"}</Button> */}
-              {/* <Button onClick={() => handleReviewSubmit(selectedMovie.id)}>Add Review</Button> */}
 
               {isLoggedIn && (
                 <>
