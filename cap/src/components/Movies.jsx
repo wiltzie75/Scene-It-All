@@ -8,6 +8,7 @@ const Movies = () => {
   const [movies, setMovies] = useState([]);
   const [userRatings, setUserRatings] = useState({});
   const [submitted, setSubmitted] = useState({});
+  const [ratingSubmitted, setRatingSubmitted] = useState({});
   const [selectedMovie, setSelectedMovie] = useState(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [addedToFavorite,setAddedToFavorite] = useState({});
@@ -102,10 +103,10 @@ const Movies = () => {
       return;
     }
     
-    // if (submitted[movieId]) {
-    //   alert("You can only submit one review.");
-    //   return;
-    // }
+    if (submitted[movieId]) {
+      alert("You can only submit one review.");
+      return;
+    }
     
     try {
       const response = await fetch(`${API}/reviews`, {
@@ -406,20 +407,20 @@ const Movies = () => {
                   <IconButton
                   key={value}
                   onClick={() => handleRating(selectedMovie.id, value)}
-                  disabled={submitted[selectedMovie.id] && !isEditingRating}
+                  disabled={ratingSubmitted[selectedMovie.id] && !isEditingRating}
                   sx={{
                     fontSize: "1.5 rem",
                     p: 0.2,
                     mb: 0.25, 
                     minWidth: 0,
                     color: value <= (selectedMovie.userRating || 0) ? "gold !important" : "gray",
-                    cursor: (submitted[selectedMovie.id] && !isEditingRating) ? "default" : "pointer",
+                    cursor: (ratingSubmitted[selectedMovie.id] && !isEditingRating) ? "default" : "pointer",
                   }}
                 >
                   <StarIcon fontSize="small" />
                 </IconButton>
                 ))}
-                {submitted[selectedMovie.id] && !isEditingRating && (
+                {ratingSubmitted[selectedMovie.id] && !isEditingRating && (
                   <Button 
                     onClick={enableRatingEdit} 
                     size="small" 
