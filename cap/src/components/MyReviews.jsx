@@ -9,7 +9,14 @@ import {
   Card,
   CardContent,
   Stack,
+  Chip,
+  IconButton,
+  Tooltip,
 } from "@mui/material";
+import EditIcon from "@mui/icons-material/Edit";
+import DeleteIcon from "@mui/icons-material/Delete";
+import SaveIcon from "@mui/icons-material/Save";
+import CancelIcon from "@mui/icons-material/Cancel";
 
 const MyReviews = () => {
   const navigate = useNavigate();
@@ -36,8 +43,7 @@ const MyReviews = () => {
           Authorization: `Bearer ${token}`,
         },
       });
-      const result = await response.json();
-      return result;
+      return await response.json();
     } catch (error) {
       console.error(error);
     }
@@ -51,9 +57,7 @@ const MyReviews = () => {
     }
 
     const APIResponse = await fetchProfile(token);
-    if (APIResponse) {
-      setProfile(APIResponse);
-    }
+    if (APIResponse) setProfile(APIResponse);
   };
 
   useEffect(() => {
@@ -77,9 +81,7 @@ const MyReviews = () => {
       }
     };
 
-    if (profile.isAdmin) {
-      fetchUsers();
-    }
+    if (profile.isAdmin) fetchUsers();
   }, [profile.isAdmin]);
 
   const handleReviewEdit = (review) => {
@@ -107,10 +109,6 @@ const MyReviews = () => {
 
       if (res.ok) {
         await getProfile();
-        const updatedReviews = profile.reviews.map((r) =>
-          r.id === reviewId ? { ...r, ...editedReview } : r
-        );
-        setProfile({ ...profile, reviews: updatedReviews });
         setEditingReviewId(null);
         setEditedReview({ subject: "", description: "" });
       }
@@ -124,7 +122,7 @@ const MyReviews = () => {
     setEditedReview({ subject: "", description: "" });
   };
 
-  async function removeReview(reviewId) {
+  const removeReview = async (reviewId) => {
     try {
       const token = localStorage.getItem("token");
       const response = await fetch(`${API}/reviews/${reviewId}`, {
@@ -133,28 +131,26 @@ const MyReviews = () => {
           Authorization: `Bearer ${token}`,
         },
       });
-      if (response.ok) {
-        await getProfile();
-      }
+      if (response.ok) await getProfile();
     } catch (error) {
       console.error(error);
     }
-  }
+  };
 
   return (
-    <Box sx={{ maxWidth: "800px", margin: "2rem auto", padding: "1rem" }}>
+    <Box sx={{ maxWidth: "800px", mx: "auto", p: 2 }}>
       <Typography
         variant="h4"
         align="center"
         gutterBottom
-        sx={{ color: "#2B2D42" }}
+        sx={{ color: "#2B2D42", fontWeight: 700 }}
       >
-        My Reviews
+        🎬 My Reviews
       </Typography>
 
       {profile && profile.reviews.length === 0 ? (
-        <Typography align="center" sx={{ color: "#EDF2F4" }}>
-          You have no reviews.
+        <Typography align="center" sx={{ color: "#8D99AE" }}>
+          You haven't written any reviews yet!
         </Typography>
       ) : (
         <Stack spacing={3}>
@@ -163,17 +159,47 @@ const MyReviews = () => {
               key={review.id}
               sx={{
                 backgroundColor: "#EDF2F4",
-                border: "1px solid #8D99AE",
-                borderRadius: "12px",
+                border: "2px solid #8D99AE",
+                borderRadius: "16px",
+                boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
               }}
             >
               <CardContent>
-                <Typography
-                  variant="h6"
-                  sx={{ color: "#2B2D42", marginBottom: "0.5rem" }}
+                <Stack
+                  direction="row"
+                  justifyContent="space-between"
+                  alignItems="center"
+                  mb={1}
                 >
-                  {review.movie?.title || "Untitled Movie"}
-                </Typography>
+                  <Chip
+                    label={review.movie?.title || "Untitled Movie"}
+                    sx={{
+                      backgroundColor: "#8D99AE",
+                      color: "#fff",
+                      fontWeight: 500,
+                    }}
+                  />
+                  {editingReviewId !== review.id && (
+                    <Stack direction="row" spacing={1}>
+                      <Tooltip title="Edit">
+                        <IconButton
+                          onClick={() => handleReviewEdit(review)}
+                          sx={{ color: "#2B2D42" }}
+                        >
+                          <EditIcon />
+                        </IconButton>
+                      </Tooltip>
+                      <Tooltip title="Delete">
+                        <IconButton
+                          onClick={() => removeReview(review.id)}
+                          sx={{ color: "#D90429" }}
+                        >
+                          <DeleteIcon />
+                        </IconButton>
+                      </Tooltip>
+                    </Stack>
+                  )}
+                </Stack>
 
                 {editingReviewId === review.id ? (
                   <>
@@ -188,7 +214,7 @@ const MyReviews = () => {
                           subject: e.target.value,
                         })
                       }
-                      sx={{ marginBottom: "1rem", backgroundColor: "#fff" }}
+                      sx={{ mb: 2, backgroundColor: "#fff" }}
                     />
                     <TextField
                       fullWidth
@@ -203,14 +229,16 @@ const MyReviews = () => {
                           description: e.target.value,
                         })
                       }
-                      sx={{ marginBottom: "1rem", backgroundColor: "#fff" }}
+                      sx={{ mb: 2, backgroundColor: "#fff" }}
                     />
                     <Stack direction="row" spacing={2}>
                       <Button
                         variant="contained"
+                        startIcon={<SaveIcon />}
                         onClick={() => handleReviewSave(review.id)}
                         sx={{
                           backgroundColor: "#2B2D42",
+                          borderRadius: "8px",
                           "&:hover": { backgroundColor: "#8D99AE" },
                         }}
                       >
@@ -218,10 +246,12 @@ const MyReviews = () => {
                       </Button>
                       <Button
                         variant="outlined"
+                        startIcon={<CancelIcon />}
                         onClick={handleReviewCancel}
                         sx={{
                           color: "#D90429",
                           borderColor: "#D90429",
+                          borderRadius: "8px",
                           "&:hover": {
                             backgroundColor: "#EF233C",
                             color: "#fff",
@@ -233,42 +263,9 @@ const MyReviews = () => {
                     </Stack>
                   </>
                 ) : (
-                  <>
-                    <Typography
-                      sx={{ color: "#2B2D42", marginBottom: "0.5rem" }}
-                    >
-                      <strong>{review.subject}:</strong> {review.description}
-                    </Typography>
-                    <Stack direction="row" spacing={2}>
-                      <Button
-                        variant="contained"
-                        onClick={() => handleReviewEdit(review)}
-                        sx={{
-                          backgroundColor: "#8D99AE",
-                          "&:hover": {
-                            backgroundColor: "#2B2D42",
-                            color: "#fff",
-                          },
-                        }}
-                      >
-                        Edit
-                      </Button>
-                      <Button
-                        variant="outlined"
-                        onClick={() => removeReview(review.id)}
-                        sx={{
-                          color: "#D90429",
-                          borderColor: "#D90429",
-                          "&:hover": {
-                            backgroundColor: "#EF233C",
-                            color: "#fff",
-                          },
-                        }}
-                      >
-                        Delete
-                      </Button>
-                    </Stack>
-                  </>
+                  <Typography sx={{ color: "#2B2D42", mt: 1 }}>
+                    <strong>{review.subject}:</strong> {review.description}
+                  </Typography>
                 )}
               </CardContent>
             </Card>
