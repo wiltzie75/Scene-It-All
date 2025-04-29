@@ -163,7 +163,7 @@ const MyComments = () => {
               sx={{
                 backgroundColor: "#EDF2F4",
                 border: "1px solid #8D99AE",
-                borderRadius: "8px",
+                borderRadius: "12px",
               }}
             >
               <CardContent>
