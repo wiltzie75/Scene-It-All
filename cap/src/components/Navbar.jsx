@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { AppBar, Toolbar, Button, Typography, Box, IconButton, Avatar } from "@mui/material";
+import { AppBar, Toolbar, Button, IconButton, Avatar } from "@mui/material";
 import { Link, useNavigate } from "react-router-dom";
 
 export default function Navbar({ token, setToken }) {
@@ -32,20 +32,10 @@ export default function Navbar({ token, setToken }) {
         "&:hover": { backgroundColor: "#A6031A" }, 
       }}
     >
-      <Toolbar>
-        <Typography 
-          variant="h5" 
-          sx={{
-            flex: 1,
-            fontFamily: "Montserrat, sans-serif", 
-            cursor: "pointer",
-            "&:hover": { color: "#FFF176" },
-          }}
-          onClick={() => navigate("/")} 
-        >
-          Scene It All
-        </Typography>
-
+      <Toolbar sx={{
+            flexDirection: "row",
+            justifyContent: "flex-end",
+          }}>
         {/* Navigation buttons */}
         <Button
           sx={{
@@ -99,7 +89,7 @@ export default function Navbar({ token, setToken }) {
           Top Rated
         </Button>
 
-        <Box sx={{ ml: 2 }}>
+        
           {token ? (
             <>
               <Button
@@ -243,7 +233,7 @@ export default function Navbar({ token, setToken }) {
               </Button>
             </>
           )}
-        </Box>
+        
       </Toolbar>
     </AppBar>
   );
