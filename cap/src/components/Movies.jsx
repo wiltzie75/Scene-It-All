@@ -3,7 +3,6 @@ import { TextField, Box, Typography, IconButton, Card, CardMedia, CardContent, D
 import StarIcon from "@mui/icons-material/Star";
 import "../App.css";
 import API from "../api/api";
-// import { hasCustomParams } from "react-admin";
 
 const Movies = () => {
   const [movies, setMovies] = useState([]);
@@ -55,7 +54,7 @@ const Movies = () => {
       const response = await fetch(`${API}/movies`);
       const data = await response.json();
       setMovies(data);
-      return data; // Return the fetched data
+      return data;
     } catch (error) {
       console.error("Error fetching movies:", error);
       return [];
@@ -77,7 +76,6 @@ const Movies = () => {
       
       setUserRatings(ratingsMap);
       
-      // Also mark these as submitted
       const submittedMap = {};
       data.forEach(rating => {
         submittedMap[rating.movieId] = true;
@@ -98,12 +96,17 @@ const Movies = () => {
       return;
     }
 
-    const user = JSON.parse(localStorage.getItem("user")); // or however you store user info
+    const user = JSON.parse(localStorage.getItem("user"));
     if (!user?.id) {
       alert("User info not found.");
       return;
     }
-
+    
+    if (submitted[movieId]) {
+      alert("You can only submit one review.");
+      return;
+    }
+    
     try {
       const response = await fetch(`${API}/reviews`, {
         method: "POST",
@@ -125,14 +128,17 @@ const Movies = () => {
       if (response.ok) {
         alert("Review added");
         setAddReview({ subject: "", description: "" });
+        setSubmitted((prev) => ({ ...prev, [movieId]: true })); 
       } else {
         alert(data.message || "Failed to add Review");
       }
+
 
     } catch (error) {
       console.error("Error adding Review", error);
     }
     setIsReviewDialogOpen(false);
+    fetchMovies();
   };
 
   const handleCommentSubmit = async (reviewId) => {
@@ -143,7 +149,7 @@ const Movies = () => {
           return;
         }
     
-        const user = JSON.parse(localStorage.getItem("user")); // or however you store user info
+        const user = JSON.parse(localStorage.getItem("user"));
         if (!user?.id) {
           alert("User info not found.");
           return;
@@ -199,8 +205,9 @@ const Movies = () => {
   };
 
   // add to favorite
-  const handleAddToFavorite = async(userId, movieId) =>{
+  const handleAddToFavorite = async(movieId) =>{
     const token = localStorage.getItem("token");
+    const user = JSON.parse(localStorage.getItem("user")); 
     if(!token){
       setShowLoginDialog(true);
       return;
@@ -212,7 +219,7 @@ const Movies = () => {
           "Content-Type": "application/json",
           "Authorization": `Bearer ${token}`,
         },
-        body: JSON.stringify({userId,movieId}),
+        body: JSON.stringify({userId: user.id, movieId: movieId}),
         
       });
 
@@ -276,7 +283,7 @@ const Movies = () => {
         setMovies((prevMovies) =>
           prevMovies.map((movie) =>
             movie.id === movieId
-              ? { ...movie, userRating: score } // Update the rating of the movie
+              ? { ...movie, userRating: score }
               : movie
           )
         );
@@ -342,9 +349,6 @@ const Movies = () => {
           currentMovies.map((movie) => (
             <Card key={movie.id} onClick={() => setSelectedMovie(movie)} sx={{ cursor: "pointer", bgcolor: "#fff", transition: "0.3s", "&:hover": { bgcolor: "#f0f0f0" } }}>
               <CardMedia component="img" height="325" image={movie.poster} alt={movie.title} />
-              {/* <CardContent>
-                <Typography variant="h6" sx={{fontSize: ".75rem"}}  >{movie.title}</Typography>
-              </CardContent> */}
             </Card>
           ))
         ) : (
@@ -354,7 +358,7 @@ const Movies = () => {
 
       {/* Pagination */}
       {totalPages > 1 && (
-        <Box sx={{ mt: 1, display: "flex", justifyContent: "center" }}>
+        <Box sx={{ mt: 1, display: "flex", justifyContent: "center", color: "#EDF2F4" }}>
           <Pagination
             count={totalPages}
             page={currentPage}
@@ -362,6 +366,14 @@ const Movies = () => {
             color="primary"
             shape="rounded"
             size="small"
+            sx={{
+              "& .MuiPaginationItem-root": {
+                color: "#EDF2F4", // Change the text color of the pagination buttons to white
+              },
+              "& .MuiPaginationItem-ellipsis": {
+                color: "#EDF2F4", // Change the ellipsis color to white (if any)
+              },
+            }}
           />
         </Box>
       )}

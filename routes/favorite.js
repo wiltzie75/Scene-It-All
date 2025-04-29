@@ -22,20 +22,15 @@ router.get('/:id/favorite', async(req, res) => {
 
 // add item to favorite
 router.post('/',verifyToken, async(req, res) => {
-    const userId = Number(req.body.userId);
-    const movieId = Number(req.body.movieId);
-    console.log(req.user);
+    const { userId, movieId } = req.body;
+    console.log('*******', req.user);
+    console.log(req.body)
 
-    if (!userId || !movieId) {
-        return res.status(400).json({ error: "userId and movieId are required." });
-      }
-      
     try{
         const user = await prisma.user.findUnique({ where: { id: userId } });
-            if (!user) {
+        if (!user) {
             return res.status(404).json({ error: `User with ID ${userId} not found.` });
-            }
-
+        }
 
         const movie = await prisma.movie.findUnique({ where: { id: movieId } });
             if (!movie) {
@@ -47,7 +42,7 @@ router.post('/',verifyToken, async(req, res) => {
                 userId: Number(userId),
                 movieId: Number(movieId),
             },
-    });
+        });
 
     res.status(201).json(addFavorite);
     } catch (error) {
