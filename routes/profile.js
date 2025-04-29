@@ -35,16 +35,10 @@ router.get('/', verifyToken, async (req, res) => {
             include: {
               movie: true,
             },
-          // },
-          // watchlist: {
-          //   include :{
-          //     movie: true,
-          //   }
           }
         },
       });
       if (!user) return res.status(404).json({ message: 'User not found' });
-// makesure the response always contains expected array fields
       const safeUser = {
         ...user,
         favorites: user.favorites ?? [],

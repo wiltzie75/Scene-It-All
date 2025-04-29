@@ -71,7 +71,7 @@ const AdminMovies = () => {
         },
         body: JSON.stringify({
           ...newMovie,
-          userId: currentUser?.id, // Add userId if available
+          userId: currentUser?.id, 
         }),
       });
       if (response.ok) {
@@ -326,10 +326,10 @@ const AdminMovies = () => {
             size="small"
             sx={{
               "& .MuiPaginationItem-root": {
-                color: "#EDF2F4", // Change the text color of the pagination buttons to white
+                color: "#EDF2F4", 
               },
               "& .MuiPaginationItem-ellipsis": {
-                color: "#EDF2F4", // Change the ellipsis color to white (if any)
+                color: "#EDF2F4",
               },
             }}
           />

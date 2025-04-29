@@ -218,23 +218,7 @@ const TopRated = () => {
                       <StarIcon fontSize="small" />
                     </IconButton>
                   ))}
-                  {/* {submitted[movie.id] && (
-                    <Button
-                      onClick={() => setSubmitted((prev) => ({ ...prev, [movie.id]: false }))}
-                      size="small"
-                      variant="outlined"
-                      sx={{
-                        fontSize: "0.7rem",
-                        p: "2px 8px",
-                        ml: 1,
-                        height: "24px",
-                      }}
-                    >
-                      Edit Rating
-                    </Button> */}
-                  {/* )} */}
                 </Box>
-                {/* {submitted[movie.id] && <Typography variant="body2">Thanks for rating!</Typography>} */}
               </Box>
             }
           </Box>

@@ -238,12 +238,7 @@ const Movies = () => {
 
         }catch(error){
           alert(data || "Failed to add to Favorite");
-        // const error = await response.json();
-        // alert(error.message || "Failed to add to Favorite");
-      }
-
-      }
-
+      }}
       }catch (error){
         console.error("Error adding to Favorite:",error);
    }
@@ -369,10 +364,10 @@ const Movies = () => {
             size="small"
             sx={{
               "& .MuiPaginationItem-root": {
-                color: "#EDF2F4", // Change the text color of the pagination buttons to white
+                color: "#EDF2F4",
               },
               "& .MuiPaginationItem-ellipsis": {
-                color: "#EDF2F4", // Change the ellipsis color to white (if any)
+                color: "#EDF2F4",
               },
             }}
           />
