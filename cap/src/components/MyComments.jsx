@@ -1,6 +1,15 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import API from "../api/api";
+import {
+  Box,
+  Typography,
+  Button,
+  TextField,
+  Card,
+  CardContent,
+  Stack,
+} from "@mui/material";
 
 const MyComments = () => {
   const navigate = useNavigate();
@@ -142,13 +151,13 @@ const MyComments = () => {
         My Comments
       </Typography>
 
-      {profile && profile.comments.length === 0 ? (
-        <Typography align="center" sx={{ color: "#8D99AE" }}>
+      {profile && profile.comments?.length === 0 ? (
+        <Typography align="center" sx={{ color: "#EDF2F4" }}>
           You have no comments.
         </Typography>
       ) : (
         <Stack spacing={3}>
-          {profile.comments.map((comment) => (
+          {profile.comments?.map((comment) => (
             <Card
               key={comment.id}
               sx={{
