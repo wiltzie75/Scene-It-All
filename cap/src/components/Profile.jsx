@@ -23,6 +23,9 @@ const Profile = () => {
     lastName: "",
   });
   const [users, setUsers] = useState([]);
+  const [userRatings, setUserRatings] = useState({});
+  const [submitted, setSubmitted] = useState({});
+  const [isEditingRating, setIsEditingRating] = useState(false);
 
   const fetchProfile = async (token) => {
     try {
@@ -134,6 +137,73 @@ const Profile = () => {
     }
   };
 
+  const fetchUserRatings = async (userId, token) => {
+    try {
+      const response = await fetch(`${API}/ratings/user/${userId}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      const data = await response.json();
+  
+      const ratingsMap = data.reduce((acc, rating) => {
+        acc[rating.movieId] = rating.score;
+        return acc;
+      }, {});
+  
+      setUserRatings(ratingsMap);
+  
+      const submittedMap = {};
+      data.forEach((rating) => {
+        submittedMap[rating.movieId] = true;
+      });
+      setSubmitted(submittedMap);
+  
+      return ratingsMap;
+    } catch (error) {
+      console.error("Error fetching user ratings:", error);
+      return {};
+    }
+  };
+
+  const handleRating = (movieId, score) => {
+    const token = localStorage.getItem("token");
+    const user = JSON.parse(localStorage.getItem("user"));
+  
+    if (!user?.id) {
+      alert("User info not found.");
+      return;
+    }
+  
+    fetch(`${API}/ratings`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        ...(token && { Authorization: `Bearer ${token}` }),
+      },
+      body: JSON.stringify({
+        userId: user.id,
+        movieId,
+        score,
+        review: ""
+      }),
+    })
+      .then((res) => {
+        if (!res.ok) throw new Error("Rating failed");
+        return res.json();
+      })
+      .then(() => {
+        setUserRatings((prev) => ({ ...prev, [movieId]: score }));
+        setSubmitted((prev) => ({ ...prev, [movieId]: true }));
+      })
+      .catch((err) => {
+        console.error("Error submitting rating:", err);
+        alert("Something went wrong when submitting your rating.");
+      });
+  };
+
+  const enableRatingEdit = () => {
+    setIsEditingRating(true);
+  };
+  
   return (
     <Container maxWidth="md" sx={{ mt: 4 }}>
       <Typography variant="h4" align="center" gutterBottom>
@@ -163,6 +233,37 @@ const Profile = () => {
                     <Typography variant="body2" color="text.secondary">
                       Ratings: {movie.movie.imdbRating}
                     </Typography>
+                    <Box>
+                <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                <Typography sx={{ marginBottom: "0.3rem" }}><strong>Your Rating:</strong></Typography>
+                {[1, 2, 3, 4, 5].map((value) => (
+                  <IconButton
+                  key={value}
+                  onClick={() => handleRating(selectedMovie.id, value)}
+                  disabled={ratingSubmitted[selectedMovie.id] && !isEditingRating}
+                  sx={{
+                    fontSize: "1.5 rem",
+                    p: 0.2,
+                    mb: 0.25, 
+                    minWidth: 0,
+                    color: value <= (selectedMovie.userRating || 0) ? "gold !important" : "gray",
+                    cursor: (ratingSubmitted[selectedMovie.id] && !isEditingRating) ? "default" : "pointer",
+                  }}
+                >
+                  <StarIcon fontSize="small" />
+                </IconButton>
+                ))}
+                {ratingSubmitted[selectedMovie.id] && !isEditingRating && (
+                  <Button 
+                    onClick={enableRatingEdit} 
+                    size="small" 
+                    variant="outlined" 
+                    sx={{ fontSize: "0.7rem", p: "2px 8px", ml: 1, height: "24px" }}
+                  >
+                    Edit Rating
+                  </Button>
+                )}
+              </Box>
                   </CardContent>
                   <CardActions>
                     <Button
