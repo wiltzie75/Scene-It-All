@@ -502,7 +502,7 @@ const Movies = () => {
               {isLoggedIn && (
                 <>
                   <Button onClick={() => handleAddToFavorite(selectedMovie.id)} sx={{ mt: 2,mr: 2 }} color="primary" variant="contained" disabled={!!addedToFavorite[selectedMovie.id]} > {addedToFavorite[selectedMovie.id] ? "Added to Favorite ✓" : "Add to Favorite"}</Button>
-                  <Button onClick={() => setIsReviewDialogOpen(true)}>Add Review</Button>
+                  <Button onClick={() => setIsReviewDialogOpen(true)} sx={{ mt: 2,mr: 2 }} variant="outlined">Add Review</Button>
                 </>
               )}
               <Button onClick={() => setSelectedMovie(null)} sx={{ mt: 2 }} color="error" variant="contained">Close</Button>
