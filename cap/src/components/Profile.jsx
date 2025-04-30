@@ -10,7 +10,9 @@ import {
   CardContent,
   CardActions,
   Button,
+  IconButton,
 } from "@mui/material";
+import StarIcon from "@mui/icons-material/Star"; // Missing import
 import API from "../api/api";
 
 const Profile = () => {
@@ -52,6 +54,10 @@ const Profile = () => {
     const APIResponse = await fetchProfile(token);
     if (APIResponse) {
       setProfile(APIResponse);
+      // Fetch ratings for the current user
+      if (APIResponse.id) {
+        fetchUserRatings(APIResponse.id, token);
+      }
     }
   };
 
@@ -193,6 +199,7 @@ const Profile = () => {
       .then(() => {
         setUserRatings((prev) => ({ ...prev, [movieId]: score }));
         setSubmitted((prev) => ({ ...prev, [movieId]: true }));
+        setIsEditingRating(false);
       })
       .catch((err) => {
         console.error("Error submitting rating:", err);
@@ -220,57 +227,55 @@ const Profile = () => {
             My Favorites
           </Typography>
           <Grid container spacing={3}>
-            {profile.favorites.map((movie) => (
-              <Grid item xs={12} sm={6} md={4} key={movie.id}>
+            {profile.favorites.map((favorite) => (
+              <Grid item xs={12} sm={6} md={4} key={favorite.id}>
                 <Card>
                   <CardMedia
                     component="img"
                     height="300"
-                    image={movie.movie.poster}
-                    alt={movie.movie.title}
+                    image={favorite.movie.poster}
+                    alt={favorite.movie.title}
                   />
                   <CardContent>
-                    <Typography variant="body2" color="text.secondary">
-                      Ratings: {movie.movie.imdbRating}
-                    </Typography>
                     <Box>
-                <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                <Typography sx={{ marginBottom: "0.3rem" }}><strong>Your Rating:</strong></Typography>
-                {[1, 2, 3, 4, 5].map((value) => (
-                  <IconButton
-                  key={value}
-                  onClick={() => handleRating(selectedMovie.id, value)}
-                  disabled={ratingSubmitted[selectedMovie.id] && !isEditingRating}
-                  sx={{
-                    fontSize: "1.5 rem",
-                    p: 0.2,
-                    mb: 0.25, 
-                    minWidth: 0,
-                    color: value <= (selectedMovie.userRating || 0) ? "gold !important" : "gray",
-                    cursor: (ratingSubmitted[selectedMovie.id] && !isEditingRating) ? "default" : "pointer",
-                  }}
-                >
-                  <StarIcon fontSize="small" />
-                </IconButton>
-                ))}
-                {ratingSubmitted[selectedMovie.id] && !isEditingRating && (
-                  <Button 
-                    onClick={enableRatingEdit} 
-                    size="small" 
-                    variant="outlined" 
-                    sx={{ fontSize: "0.7rem", p: "2px 8px", ml: 1, height: "24px" }}
-                  >
-                    Edit Rating
-                  </Button>
-                )}
-              </Box>
+                      <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                        <Typography sx={{ marginRight: "0.5rem" }}><strong>Your Rating:</strong></Typography>
+                        {[1, 2, 3, 4, 5].map((value) => (
+                          <IconButton
+                            key={value}
+                            onClick={() => handleRating(favorite.movie.id, value)}
+                            disabled={submitted[favorite.movie.id] && !isEditingRating}
+                            sx={{
+                              fontSize: "1.5rem",
+                              p: 0.2,
+                              mb: 0.25, 
+                              minWidth: 0,
+                              color: value <= (userRatings[favorite.movie.id] || 0) ? "gold" : "gray",
+                              cursor: (submitted[favorite.movie.id] && !isEditingRating) ? "default" : "pointer",
+                            }}
+                          >
+                            <StarIcon fontSize="small" />
+                          </IconButton>
+                        ))}
+                        {submitted[favorite.movie.id] && !isEditingRating && (
+                          <Button 
+                            onClick={enableRatingEdit} 
+                            size="small" 
+                            variant="outlined" 
+                            sx={{ fontSize: "0.7rem", p: "2px 8px", ml: 1, height: "24px" }}
+                          >
+                            Edit Rating
+                          </Button>
+                        )}
+                      </Box>
+                    </Box>
                   </CardContent>
                   <CardActions>
                     <Button
                       variant="contained"
                       color="error"
                       fullWidth
-                      onClick={() => handleRemoveFromFavorite(movie.id)}
+                      onClick={() => handleRemoveFromFavorite(favorite.id)}
                     >
                       Remove from Favorite
                     </Button>

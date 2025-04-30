@@ -88,15 +88,6 @@ model UserRating {
   @@unique([userId, movieId])
 }
 
-// model Favorite {
-//   id      String @id @default(uuid())
-//   movie   Movie  @relation(fields: [movieId], references: [id], onDelete: Cascade)
-//   movieId Int
-//   user    User   @relation(fields: [userId], references: [id], onDelete: Cascade)
-//   userId  Int
-//   @@unique([userId, movieId])
-// }
-
 model Favorite {
   id      Int   @id @default(autoincrement())
   userId  Int
