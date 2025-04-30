@@ -1,10 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import API from "../api/api";
-// import { favorite } from "../../../prisma";
-// import { favorite } from "../../../prisma";
-// import { BottomNavigation } from "@mui/material";
-// import { border } from "@mui/system";
 
 const Profile = (props) => {
     const navigate = useNavigate();
@@ -110,7 +106,6 @@ const Profile = (props) => {
                     "Content-Type": "application/json",
                     "Authorization": `Bearer ${token}`,
                 },
-                // body: JSON.stringify({ movieId }), 
             });
 
             if (response.ok) {

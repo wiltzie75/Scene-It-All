@@ -29,7 +29,7 @@ const Login = ({token, setToken}) => {
       return;
     }
 
-    setError(""); // Clear any existing error
+    setError(""); 
 
     try {
       const res = await fetch("http://localhost:3000/api/users/login", {
@@ -70,7 +70,7 @@ const Login = ({token, setToken}) => {
         }}
       >
         <Typography component="h1" variant="h5" sx={{ mb: 2 }}>
-          Login to MovieZone
+          Login to Scene It All
         </Typography>
         <Box component="form" onSubmit={handleSubmit} sx={{ mt: 1 }}>
           <TextField

@@ -60,7 +60,6 @@ router.post("/", verifyToken, async (req, res) => {
     }
 
     try {
-      // Check if the user has already rated the movie
       const existingRating = await prisma.userRating.findUnique({
         where: {
           userId_movieId: {
@@ -71,7 +70,6 @@ router.post("/", verifyToken, async (req, res) => {
       });
 
       if (existingRating) {
-        // If rating exists, update it
         const updatedRating = await prisma.userRating.update({
           where: {
             userId_movieId: {
@@ -86,7 +84,6 @@ router.post("/", verifyToken, async (req, res) => {
         });
         return res.json({ message: "Rating updated", updatedRating });
       } else {
-        // If no rating exists, create a new one
         const newRating = await prisma.userRating.create({
           data: {
             userId: parseInt(userId),
