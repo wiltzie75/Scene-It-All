@@ -7,7 +7,7 @@ import API from "../api/api";
 const Movies = () => {
   const [movies, setMovies] = useState([]);
   const [userRatings, setUserRatings] = useState({});
-  const [submitted, setSubmitted] = useState({});
+  const [reviewSubmitted, setReviewSubmitted] = useState({}); 
   const [ratingSubmitted, setRatingSubmitted] = useState({});
   const [selectedMovie, setSelectedMovie] = useState(null);
   const [searchTerm, setSearchTerm] = useState("");
@@ -77,12 +77,6 @@ const Movies = () => {
       
       setUserRatings(ratingsMap);
       
-      const submittedMap = {};
-      data.forEach(rating => {
-        submittedMap[rating.movieId] = true;
-      });
-      setSubmitted(submittedMap);
-      
       return ratingsMap;
     } catch (error) {
       console.error("Error fetching user ratings:", error);
@@ -103,7 +97,7 @@ const Movies = () => {
       return;
     }
     
-    if (submitted[movieId]) {
+    if (reviewSubmitted[movieId]) {
       alert("You can only submit one review.");
       return;
     }
@@ -129,7 +123,7 @@ const Movies = () => {
       if (response.ok) {
         alert("Review added");
         setAddReview({ subject: "", description: "" });
-        setSubmitted((prev) => ({ ...prev, [movieId]: true })); 
+        setReviewSubmitted((prev) => ({ ...prev, [movieId]: true }));
       } else {
         alert(data.message || "Failed to add Review");
       }
@@ -283,7 +277,7 @@ const Movies = () => {
               : movie
           )
         );
-        setSubmitted((prev) => ({ ...prev, [movieId]: true }));
+        setRatingSubmitted((prev) => ({ ...prev, [movieId]: true }));
         setSelectedMovie((prevMovie) => ({
           ...prevMovie,
           userRating: score,
