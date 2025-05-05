@@ -26,7 +26,8 @@ Scene It All is a full-stack movie review platform where users can browse movies
 
 Our team began with clear feature planning and wireframing key pages. This upfront organization helped keep the project focused and collaborative. Regular check-ins and a shared workflow helped us stay aligned across both frontend and backend development.
 
-👤 Role & Contributions 
+👤 Role & Contributions
+
 Eric Graham: 
 	•	Designed and implemented the Prisma schema
 	•	Imported real movie data from the OMDb API via a custom seed script
