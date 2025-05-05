@@ -9,13 +9,7 @@ import {
   Card,
   CardContent,
   Stack,
-  IconButton,
-  Tooltip,
 } from "@mui/material";
-import EditIcon from "@mui/icons-material/Edit";
-import DeleteIcon from "@mui/icons-material/Delete";
-import SaveIcon from "@mui/icons-material/Save";
-import CloseIcon from "@mui/icons-material/Close";
 
 const MyComments = () => {
   const navigate = useNavigate();
@@ -114,6 +108,8 @@ const MyComments = () => {
 
       if (res.ok) {
         await getProfile();
+        const updatedComments = profile.comments.map((c) => c);
+        setProfile({ ...profile, comments: updatedComments });
         setEditingCommentId(null);
         setEditedComment({ subject: "", description: "" });
       }
@@ -175,7 +171,7 @@ const MyComments = () => {
                   variant="h6"
                   sx={{ color: "#2B2D42", marginBottom: "0.5rem" }}
                 >
-                  {comment.review?.movie?.title || "Untitled Movie"}
+                  {comment.review?.movie?.title}
                 </Typography>
 
                 {editingCommentId === comment.id ? (
@@ -208,54 +204,71 @@ const MyComments = () => {
                       }
                       sx={{ marginBottom: "1rem", backgroundColor: "#fff" }}
                     />
+                    <Stack direction="row" spacing={2}>
+                      <Button
+                        variant="contained"
+                        onClick={() => handleCommentSave(comment.id)}
+                        sx={{
+                          backgroundColor: "#2B2D42",
+                          "&:hover": { backgroundColor: "#8D99AE" },
+                        }}
+                      >
+                        Save
+                      </Button>
+                      <Button
+                        variant="outlined"
+                        onClick={handleCommentCancel}
+                        sx={{
+                          color: "#D90429",
+                          borderColor: "#D90429",
+                          "&:hover": {
+                            backgroundColor: "#EF233C",
+                            color: "#fff",
+                          },
+                        }}
+                      >
+                        Cancel
+                      </Button>
+                    </Stack>
                   </>
                 ) : (
-                  <Typography sx={{ color: "#2B2D42" }}>
-                    <strong>{comment.subject}:</strong> {comment.description}
-                  </Typography>
+                  <>
+                    <Typography
+                      sx={{ color: "#2B2D42", marginBottom: "0.5rem" }}
+                    >
+                      <strong>{comment.subject}:</strong> {comment.description}
+                    </Typography>
+                    <Stack direction="row" spacing={2}>
+                      <Button
+                        variant="contained"
+                        onClick={() => handleCommentEdit(comment)}
+                        sx={{
+                          backgroundColor: "#8D99AE",
+                          "&:hover": {
+                            backgroundColor: "#2B2D42",
+                            color: "#fff",
+                          },
+                        }}
+                      >
+                        Edit
+                      </Button>
+                      <Button
+                        variant="outlined"
+                        onClick={() => removeComment(comment.id)}
+                        sx={{
+                          color: "#D90429",
+                          borderColor: "#D90429",
+                          "&:hover": {
+                            backgroundColor: "#EF233C",
+                            color: "#fff",
+                          },
+                        }}
+                      >
+                        Delete
+                      </Button>
+                    </Stack>
+                  </>
                 )}
-
-                <Stack direction="row" spacing={1} mt={2}>
-                  {editingCommentId === comment.id ? (
-                    <>
-                      <Tooltip title="Save">
-                        <IconButton
-                          onClick={() => handleCommentSave(comment.id)}
-                          sx={{ color: "#2B2D42" }}
-                        >
-                          <SaveIcon />
-                        </IconButton>
-                      </Tooltip>
-                      <Tooltip title="Cancel">
-                        <IconButton
-                          onClick={handleCommentCancel}
-                          sx={{ color: "#D90429" }}
-                        >
-                          <CloseIcon />
-                        </IconButton>
-                      </Tooltip>
-                    </>
-                  ) : (
-                    <>
-                      <Tooltip title="Edit">
-                        <IconButton
-                          onClick={() => handleCommentEdit(comment)}
-                          sx={{ color: "#8D99AE" }}
-                        >
-                          <EditIcon />
-                        </IconButton>
-                      </Tooltip>
-                      <Tooltip title="Delete">
-                        <IconButton
-                          onClick={() => removeComment(comment.id)}
-                          sx={{ color: "#D90429" }}
-                        >
-                          <DeleteIcon />
-                        </IconButton>
-                      </Tooltip>
-                    </>
-                  )}
-                </Stack>
               </CardContent>
             </Card>
           ))}
