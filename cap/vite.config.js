@@ -7,6 +7,6 @@ export default defineConfig({
    preview: {
     host: '0.0.0.0',
     port: process.env.PORT || 4173,
-    allowedHosts: 'all'
+    allowedHosts: '['scene-it-all.onrender.com']'
   }
 })
