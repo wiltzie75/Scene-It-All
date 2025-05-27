@@ -1,5 +1,6 @@
-# Scene It All🎬 Scene It All
+🎬 Scene It All
 
+![Home Page Screenshot](./assets/homepage.png)
 Scene It All is a full-stack movie review platform where users can browse movies, leave reviews and star ratings, comment on others’ reviews, and—if they’re admins—manage users and movie data through a dedicated interface. Designed with a clean, user-friendly experience in mind, the app encourages thoughtful engagement with film.
 
 👥 Team
@@ -25,12 +26,21 @@ Scene It All is a full-stack movie review platform where users can browse movies
 
 Our team began with clear feature planning and wireframing key pages. This upfront organization helped keep the project focused and collaborative. Regular check-ins and a shared workflow helped us stay aligned across both frontend and backend development.
 
-👤 Role & Contributions (by [Your Name])
+👤 Role & Contributions
+
+Eric Graham: 
 	•	Designed and implemented the Prisma schema
 	•	Imported real movie data from the OMDb API via a custom seed script
 	•	Used faker.js to generate realistic reviews, ratings, and comments for development and testing
 	•	Built the home page with custom CSS
 	•	Contributed to the Movies and Admin Movies pages on the frontend
+
+ Ben Hogle:
+
+ Daniel Garibay:
+
+ Olivia Chen:
+ 
 
 ⚠️ Challenges
 	•	Managing merge conflicts and maintaining consistency across branches
