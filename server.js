@@ -1,5 +1,6 @@
 const express = require('express');
 const cors = require("cors");
+const path = require('path');
 const app = express(); 
 
 const movieRoutes = require('./routes/movie');
@@ -28,6 +29,16 @@ app.use('/api/favorite', favoriteRoutes);
 app.use('/api/profile', profileRoutes);
 app.use('/api/topRated', topRatedRoutes);
 app.use('/api/ratings', ratingsRoutes);
+
+// Serve static files from React build (only in production)
+if (process.env.NODE_ENV === 'production') {
+  app.use(express.static(path.join(__dirname, 'cap/dist')));
+  
+// Catch all handler: send back React's index.html file for any non-API routes
+  app.get('*', (req, res) => {
+    res.sendFile(path.join(__dirname, 'cap/dist/index.html'));
+  });
+}
  
 // Set the server port and start the server
 const PORT = process.env.PORT || 3000;
