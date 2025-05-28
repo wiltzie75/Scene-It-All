@@ -46,3 +46,7 @@ app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
 
+app.use((req, res, next) => {
+  console.log('Route accessed:', req.method, req.path);
+  next();
+});
