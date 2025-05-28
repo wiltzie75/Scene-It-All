@@ -20,15 +20,15 @@ require('dotenv').config();
 app.use(express.json());
 
 // Set up routes
-app.use('/api/movies', movieRoutes);
-// app.use('/api/reviews', reviewRoutes);
-// app.use('/api/users', userRoutes);
-// app.use('/api/auth',authRoutes);
-// app.use('/api/comments',commentsRoutes);
-// app.use('/api/favorite', favoriteRoutes);
-// app.use('/api/profile', profileRoutes);
-// app.use('/api/topRated', topRatedRoutes);
-// app.use('/api/ratings', ratingsRoutes);
+// app.use('/api/movies', movieRoutes);
+app.use('/api/reviews', reviewRoutes);
+app.use('/api/users', userRoutes);
+app.use('/api/auth',authRoutes);
+app.use('/api/comments',commentsRoutes);
+app.use('/api/favorite', favoriteRoutes);
+app.use('/api/profile', profileRoutes);
+app.use('/api/topRated', topRatedRoutes);
+app.use('/api/ratings', ratingsRoutes);
 
 // Serve static files from React build (only in production)
 if (process.env.NODE_ENV === 'production') {
