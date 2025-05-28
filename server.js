@@ -1,3 +1,8 @@
+const express = require('express');
+const cors = require("cors");
+const path = require('path');
+const app = express(); 
+
 app.get('/api/debug', async (req, res) => {
   try {
     console.log('DATABASE_URL:', process.env.DATABASE_URL);
@@ -13,11 +18,6 @@ app.get('/api/debug', async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 });
-
-const express = require('express');
-const cors = require("cors");
-const path = require('path');
-const app = express(); 
 
 const movieRoutes = require('./routes/movie');
 const reviewRoutes = require('./routes/reviews');
