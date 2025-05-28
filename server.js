@@ -1,7 +1,21 @@
 const express = require('express');
 const cors = require("cors");
 const path = require('path');
-const app = express(); 
+const app = express();
+const prisma = new PrismaClient(); // Initialize Prisma Client
+
+// Load environment variables
+require('dotenv').config();
+
+// Middleware setup (should come before routes)
+app.use(cors({ origin: "*" }));
+app.use(express.json());
+
+// Logging middleware (moved to top to catch all requests)
+app.use((req, res, next) => {
+  console.log('Route accessed:', req.method, req.path);
+  next();
+}); 
 
 app.get('/api/debug', async (req, res) => {
   try {
