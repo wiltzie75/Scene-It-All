@@ -39,6 +39,22 @@ if (process.env.NODE_ENV === 'production') {
     res.sendFile(path.join(__dirname, 'cap/dist/index.html'));
   });
 }
+
+app.get('/api/debug', async (req, res) => {
+  try {
+    console.log('DATABASE_URL:', process.env.DATABASE_URL);
+    const movieCount = await prisma.movie.count();
+    const reviewCount = await prisma.review.count();
+    res.json({ 
+      movies: movieCount, 
+      reviews: reviewCount,
+      dbUrl: process.env.DATABASE_URL ? 'Set' : 'Missing'
+    });
+  } catch (error) {
+    console.error('Database connection error:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
  
 // Set the server port and start the server
 const PORT = process.env.PORT || 3000;
