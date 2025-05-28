@@ -96,3 +96,6 @@ model Favorite {
   movie   Movie @relation(fields: [movieId], references: [id])
   @@unique([userId, movieId])
 }
+
+
+postgresql://movie_capstone_db_2qdj_user:7Aa5Q17fNnOozzP02iL9V2LZSQJX6bSr@dpg-d0r3ur2dbo4c73a0nksg-a/movie_capstone_db_2qdj

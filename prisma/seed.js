@@ -146,19 +146,40 @@ const seed = async () => {
     await prisma.movie.createMany({ data: formatted });
   };
 
-  const seedReviews = async () => {
-    const users = await prisma.user.findMany({ select: { id: true } });
-    const movies = await prisma.movie.findMany({ select: { id: true } });
+  
+const seedReviews = async () => {
+  const users = await prisma.user.findMany({ select: { id: true } });
+  const movies = await prisma.movie.findMany({ select: { id: true } });
 
-    const reviews = Array.from({ length: 40 }, () => ({
-      subject: faker.company.buzzPhrase(),
-      description: faker.lorem.paragraph(),
-      movieId: faker.helpers.arrayElement(movies).id,
-      userId: faker.helpers.arrayElement(users).id,
-    }));
+  // Create a Set to track unique user-movie combinations
+  const usedCombinations = new Set();
+  const reviews = [];
 
-    await prisma.review.createMany({ data: reviews });
-  };
+  // Generate up to 40 reviews, but ensure uniqueness
+  let attempts = 0;
+  const maxAttempts = 1000; // Prevent infinite loop
+
+  while (reviews.length < 40 && attempts < maxAttempts) {
+    const userId = faker.helpers.arrayElement(users).id;
+    const movieId = faker.helpers.arrayElement(movies).id;
+    const combination = `${userId}-${movieId}`;
+
+    // Only add if this combination hasn't been used
+    if (!usedCombinations.has(combination)) {
+      usedCombinations.add(combination);
+      reviews.push({
+        subject: faker.company.buzzPhrase(),
+        description: faker.lorem.paragraph(),
+        movieId: movieId,
+        userId: userId,
+      });
+    }
+    attempts++;
+  }
+
+  console.log(`Creating ${reviews.length} unique reviews`);
+  await prisma.review.createMany({ data: reviews });
+};
 
   const seedComment = async () => {
     const users = await prisma.user.findMany({ select: { id: true } });
