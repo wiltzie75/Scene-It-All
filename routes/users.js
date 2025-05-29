@@ -47,7 +47,8 @@ router.post('/login', async (req, res, next) => {
     const { email, password } = req.body;
     const user = await prisma.user.findUnique({
       where: 
-        {email} });
+        {email} 
+      });
       // Return 404 instead of 200 for "no user found"
       if(!user) return res.status(404).json({error: "no user found"});
       
@@ -70,7 +71,7 @@ router.post('/login', async (req, res, next) => {
     } catch (error) {
       next(error);
     }
-  })
+  });
 
 
 // create user (register)
