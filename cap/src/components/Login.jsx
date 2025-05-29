@@ -33,7 +33,7 @@ const Login = ({token, setToken}) => {
     setError(""); 
 
     try {
-      const res = await fetch(`${API}/users/login`), {
+      const res = await fetch(`${API}/users/login`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
