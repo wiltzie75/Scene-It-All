@@ -44,7 +44,15 @@ const favoriteRoutes = require('./routes/favorite');
 const topRatedRoutes = require('./routes/topRated');
 const profileRoutes = require('./routes/profile');
 const ratingsRoutes = require('./routes/ratings');
-app.use(cors({ origin: "*" }));
+// app.use(cors({ origin: "*" }));
+
+app.use(cors({
+  origin: process.env.NODE_ENV === 'production' 
+    ? 'https://scene-it-all.onrender.com'
+    : 'http://localhost:3000',
+  credentials: true
+}));
+
 require('dotenv').config();
 // set api
 // Use middleware to parse JSON request body
