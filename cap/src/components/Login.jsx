@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import API from "../api/api";
 import {
   Container,
   Box,
@@ -32,7 +33,7 @@ const Login = ({token, setToken}) => {
     setError(""); 
 
     try {
-      const res = await fetch("http://localhost:3000/api/users/login", {
+      const res = await fetch(`${API}/users/login`), {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
