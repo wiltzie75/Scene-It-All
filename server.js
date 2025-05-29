@@ -9,7 +9,13 @@ const prisma = new PrismaClient(); // Initialize Prisma Client
 require('dotenv').config();
 
 // Middleware setup (should come before routes)
-app.use(cors({ origin: "*" }));
+app.use(cors({
+  origin: process.env.NODE_ENV === 'production' 
+    ? 'https://scene-it-all.onrender.com'
+    : 'http://localhost:3000',
+  credentials: true
+}));
+
 app.use(express.json());
 
 // Logging middleware (moved to top to catch all requests)
@@ -40,23 +46,12 @@ const userRoutes = require('./routes/users');
 const authRoutes = require('./routes/auth');
 const commentsRoutes = require('./routes/comments');
 const favoriteRoutes = require('./routes/favorite');
-// const recentReviewsRoutes = require('./routes/recentReviews');
 const topRatedRoutes = require('./routes/topRated');
 const profileRoutes = require('./routes/profile');
 const ratingsRoutes = require('./routes/ratings');
-// app.use(cors({ origin: "*" }));
 
-app.use(cors({
-  origin: process.env.NODE_ENV === 'production' 
-    ? 'https://scene-it-all.onrender.com'
-    : 'http://localhost:3000',
-  credentials: true
-}));
-
-require('dotenv').config();
 // set api
 // Use middleware to parse JSON request body
-app.use(express.json());
 
 // Set up routes
 app.use('/api/movies', movieRoutes);
