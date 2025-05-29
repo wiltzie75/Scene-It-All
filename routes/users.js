@@ -48,10 +48,13 @@ router.post('/login', async (req, res, next) => {
     const user = await prisma.user.findUnique({
       where: 
         {email} });
-      if(!user) return res.json({error: "no user found"})
+      // Return 404 instead of 200 for "no user found"
+      if(!user) return res.status(404).json({error: "no user found"});
       
-        const passwordCheck = await bcrypt.compare(password, user.password)
-        if(!passwordCheck) return res.json({error: "incorrect password :("})
+      const passwordCheck = await bcrypt.compare(password, user.password);
+      
+      // Return 401 instead of 200 for "incorrect password"
+      if(!passwordCheck) return res.status(401).json({error: "incorrect password :("});
 
           const token = jwt.sign({ id: user.id }, process.env.JWT);
           res.json({
