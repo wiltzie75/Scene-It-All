@@ -37,6 +37,11 @@ app.get('/api/debug', async (req, res) => {
   }
 });
 
+app.use((error, req, res, next) => {
+  console.error('Server error:', error);
+  res.status(500).json({ error: 'Internal server error' });
+});
+
 // Import route files
 const movieRoutes = require('./routes/movie');
 const reviewRoutes = require('./routes/reviews');
