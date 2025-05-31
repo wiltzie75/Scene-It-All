@@ -26,7 +26,6 @@ app.use((req, res, next) => {
 
 app.get('/api/debug', async (req, res) => {
   try {
-    console.log('DATABASE_URL:', process.env.DATABASE_URL);
     const movieCount = await prisma.movie.count();
     const reviewCount = await prisma.review.count();
     res.json({ 
@@ -39,32 +38,6 @@ app.get('/api/debug', async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 });
-
-const fs = require('fs');
-
-// Add this before your static file serving
-if (process.env.NODE_ENV === 'production') {
-  const staticPath = path.join(__dirname, 'cap/dist');
-  
-  // Debug logging
-  console.log('Static path:', staticPath);
-  console.log('Directory exists:', fs.existsSync(staticPath));
-  
-  if (fs.existsSync(staticPath)) {
-    const files = fs.readdirSync(staticPath);
-    console.log('Files in dist:', files);
-    console.log('index.html exists:', fs.existsSync(path.join(staticPath, 'index.html')));
-  }
-  
-  app.use(express.static(staticPath));
-  
-  app.get('*', (req, res) => {
-    const indexPath = path.join(staticPath, 'index.html');
-    console.log('Serving index.html from:', indexPath);
-    console.log('index.html exists:', fs.existsSync(indexPath));
-    res.sendFile(indexPath);
-  });
-}
 
 const movieRoutes = require('./routes/movie');
 const reviewRoutes = require('./routes/reviews');
