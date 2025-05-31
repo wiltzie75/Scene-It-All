@@ -3,8 +3,6 @@ const router = express.Router();
 const bcrypt = require ('bcrypt');
 const jwt = require('jsonwebtoken');
 const JWT = process.env.JWT;
-// const verifyToken = require('./verify');
-// const prisma = require('../prisma');
 const { PrismaClient } = require('@prisma/client');
 const prisma = new PrismaClient();
 

@@ -1,12 +1,10 @@
 const express = require('express');
 const router = express.Router();
-// const prisma = require('../prisma');
 const { PrismaClient } = require('@prisma/client');
 const prisma = new PrismaClient();
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const JWT = process.env.JWT;
-// const verifyToken = require('./verify');
 
 // get all users
 router.get('/', async (req, res) => {
@@ -46,45 +44,34 @@ router.get('/:id', async (req, res) => {
 // login user
 router.post('/login', async (req, res, next) => {
   try {
-    console.log('Login attempt with:', req.body); // Add logging
     const { email, password } = req.body;
-    
     const user = await prisma.user.findUnique({
-      where: { email }
-    });
-    
-    // Return 404 instead of 200 for "no user found"
-    if (!user) {
-      console.log('User not found for email:', email);
-      return res.status(404).json({ error: "no user found" });
-    }
-    
-    const passwordCheck = await bcrypt.compare(password, user.password);
-    
-    // Return 401 instead of 200 for "incorrect password"
-    if (!passwordCheck) {
-      console.log('Incorrect password for email:', email);
-      return res.status(401).json({ error: "incorrect password :(" });
-    }
+      where: 
+        {email} 
+      });
+      // Return 404 instead of 200 for "no user found"
+      if(!user) return res.status(404).json({error: "no user found"});
+      
+      const passwordCheck = await bcrypt.compare(password, user.password);
+      
+      // Return 401 instead of 200 for "incorrect password"
+      if(!passwordCheck) return res.status(401).json({error: "incorrect password :("});
 
-    const token = jwt.sign({ id: user.id }, process.env.JWT);
-    console.log('Login successful for:', email);
-    
-    res.json({
-      token,
-      user: {
-        id: user.id,
-        email: user.email,
-        isAdmin: user.isAdmin,
-        firstName: user.firstName,
-        lastName: user.lastName,
-      },
-    });
-  } catch (error) {
-    console.error('Login error:', error);
-    next(error);
-  }
-});
+          const token = jwt.sign({ id: user.id }, process.env.JWT);
+          res.json({
+            token,
+            user: {
+              id: user.id,
+              email: user.email,
+              isAdmin: user.isAdmin,
+              firstName: user.firstName,
+              lastName: user.lastName,
+            },
+          });
+    } catch (error) {
+      next(error);
+    }
+  });
 
 // create user (register)
 router.post('/', async (req, res) => {
