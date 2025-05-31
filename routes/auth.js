@@ -3,8 +3,15 @@ const router = express.Router();
 const bcrypt = require ('bcrypt');
 const jwt = require('jsonwebtoken');
 const JWT = process.env.JWT;
-const verifyToken = require('./verify');
-const prisma = require('../prisma');
+// const verifyToken = require('./verify');
+// const prisma = require('../prisma');
+const { PrismaClient } = require('@prisma/client');
+const prisma = new PrismaClient();
+
+router.get('/', (req, res) => {
+  console.log('Auth route hit!');
+  res.json({ message: 'Auth route working!' });
+});
 
 router.post('/register',async(req,res) => {
     const{ firstName , lastName, email, password} = req.body;

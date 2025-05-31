@@ -1,10 +1,12 @@
 const express = require('express');
 const router = express.Router();
-const prisma = require('../prisma');
+// const prisma = require('../prisma');
+const { PrismaClient } = require('@prisma/client');
+const prisma = new PrismaClient();
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const JWT = process.env.JWT;
-const verifyToken = require('./verify');
+// const verifyToken = require('./verify');
 
 // get all users
 router.get('/', async (req, res) => {
