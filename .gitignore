@@ -43,3 +43,6 @@ coverage/
 
 # Optional: ignore parcel or other bundlers
 .cache/
+
+# render build command
+*npm install && npx prisma generate && npx prisma db push && cd cap && rm -rf node_modules package-lock.json && npm install && npm run build
